@@ -1,0 +1,75 @@
+<!-- #Include file="Includes/Menu.asp" -->
+
+<HTML>
+<HEAD>
+	<TITLE>IT Intranet: Home</TITLE>
+	<link rel="stylesheet" href="Styles/Style.css" type="text/css"></link>
+	<SCRIPT language=JavaScript>
+	<!--
+	function HideNonPrintables()
+	{
+		for (Counter=0;Counter<HidePrint.length;Counter++) HidePrint[Counter].style.display = 'None';
+	}
+	function ShowNonPrintables()
+	{
+		for (Counter=0;Counter<HidePrint.length;Counter++) HidePrint[Counter].style.display = 'Inline';
+	}
+	//-->
+	</SCRIPT>
+</HEAD>
+
+<BODY onbeforeprint="HideNonPrintables()" onafterprint="ShowNonPrintables()">
+	<TABLE width=770 cellpadding=0 cellspacing=0 align=center width=770>
+		<TR id=HidePrint height=79><TD colspan=3 background=Images/Logo.gif align=right class=Copyright><A href="SiteMap.asp">Site Map</A><IMG align="absmiddle" width=19 height=12 src="Images/PrivacyDivider.gif"><A href="ContactUs.asp">Contact Us</A></TD></TR>
+		<TR id=HidePrint><TD colspan=3><IMG height=11 width=770 src="Images/DottedLine.gif"></TD></TR>
+		<TR id=HidePrint>
+			<TD width=190><DIV class=HomeLink><A href="index.asp" width=100%>HOME</A></DIV></TD>
+			<TD width=10>&nbsp;</TD>
+			<TD width=570><DIV class=Welcome>Welcome to the Oxiana IT intranet</DIV></TD>
+		</TR>
+		<TR id=HidePrint><TD colspan=3><IMG height=11 width=770 src="Images/DottedLine.gif"></TD></TR>
+		<TR>
+			<TD id=HidePrint width=190 valign=top>
+				<TABLE cellpadding=0 cellspacing=0 width=100%>
+					<%ShowMenu%>
+				</TABLE>
+			</TD>
+			<TD width=10></TD>
+			<TD width=570 valign=top>
+				<TABLE cellpadding=0 cellspacing=0>
+					<TR>
+						<TD width=275 valign=top>
+							<B>Here you will find all the information you need to know about the services we provide to Oxiana.<BR>
+							<BR>
+							From getting help from your Service Centre to IT procurement, you can even meet the team.</B><BR>
+							<IMG height=21 width=275 src="Images/SmallDivider.gif"><BR>
+							<DIV class=SubHeading>Contact Details</DIV>
+							<B>IT Helpdesk: 1300 694 262<BR>
+							(1300 OXIANA)<BR>
+							<A href="mailto:redacted@example.com">redacted@example.com</A></B><BR>
+							<BR>
+							Hours: 6:00am - 6:00pm (WST)<BR>
+							7 days a week<BR>
+							<BR>
+							If calling outside Australia, contact:<BR>
+							+61 3 9321 9072
+							
+						</TD>
+						<TD width=10>&nbsp;</TD>
+						<TD width=285 valign=top style="BACKGROUND-COLOR:#E8E8E8">
+							<DIV style="BACKGROUND-COLOR:#646464;COLOR:#FFFFFF;FONT-WEIGHT:Bold;PADDING:4px;PADDING-LEFT:8px">ADVICE & TIPS</DIV>
+							<DIV style="PADDING:8px">
+								<B><A href="">Changing your email signature</A></B><BR>
+								Oxiana has recently changed their email signature across the group. View instructions on how to change your email signature in Microsoft Outlook OWA web email.
+							</DIV>
+						</TD>
+					</TR>
+				</TABLE>
+				<DIV class=Copyright><BR>This page last updated: 12 Jun 2006 (Empired)</DIV>
+			</TD>
+		</TR>
+		<TR id=HidePrint><TD colspan=3><IMG height=11 width=770 src="Images/DottedLine.gif"></TD></TR>
+		<TR id=HidePrint><TD colspan=3 class=Copyright><A href="IntranetDisclaimer.asp">Disclaimer</A><IMG align="absmiddle" width=19 height=12 src="Images/PrivacyDivider.gif"><A href="IntranetPrivacyStatement.asp">Privacy</A><IMG align="absmiddle" width=19 height=12 src="Images/PrivacyDivider.gif">Copyright Oxiana Limited 2006</TD></TR>
+	</TABLE>
+</BODY>
+</HTML>

@@ -1,0 +1,582 @@
+<VisualStudioProject>
+    <VisualBasic
+        ProjectType = "Web"
+        ProductVersion = "7.0.9466"
+        SchemaVersion = "1.0"
+        ProjectGuid = "{6B7FD369-1711-480D-AA86-ABA716FA509F}"
+    >
+        <Build>
+            <Settings
+                ApplicationIcon = ""
+                AssemblyKeyContainerName = ""
+                AssemblyName = "Empired"
+                AssemblyOriginatorKeyFile = ""
+                AssemblyOriginatorKeyMode = "None"
+                DefaultClientScript = "JScript"
+                DefaultHTMLPageLayout = "Grid"
+                DefaultTargetSchema = "IE50"
+                DelaySign = "false"
+                OutputType = "Library"
+                OptionCompare = "Binary"
+                OptionExplicit = "On"
+                OptionStrict = "Off"
+                RootNamespace = "Empired"
+                StartupObject = ""
+            >
+                <Config
+                    Name = "Debug"
+                    BaseAddress = "285212672"
+                    ConfigurationOverrideFile = ""
+                    DefineConstants = ""
+                    DefineDebug = "true"
+                    DefineTrace = "true"
+                    DebugSymbols = "true"
+                    IncrementalBuild = "true"
+                    Optimize = "false"
+                    OutputPath = "bin\"
+                    RegisterForComInterop = "false"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "1"
+                />
+                <Config
+                    Name = "Release"
+                    BaseAddress = "285212672"
+                    ConfigurationOverrideFile = ""
+                    DefineConstants = ""
+                    DefineDebug = "false"
+                    DefineTrace = "true"
+                    DebugSymbols = "false"
+                    IncrementalBuild = "false"
+                    Optimize = "true"
+                    OutputPath = "bin\"
+                    RegisterForComInterop = "false"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "1"
+                />
+            </Settings>
+            <References>
+                <Reference
+                    Name = "System"
+                    AssemblyName = "System"
+                />
+                <Reference
+                    Name = "System.Data"
+                    AssemblyName = "System.Data"
+                />
+                <Reference
+                    Name = "System.Drawing"
+                    AssemblyName = "System.Drawing"
+                />
+                <Reference
+                    Name = "System.Web"
+                    AssemblyName = "System.Web"
+                />
+                <Reference
+                    Name = "System.XML"
+                    AssemblyName = "System.Xml"
+                />
+            </References>
+            <Imports>
+                <Import Namespace = "Microsoft.VisualBasic" />
+                <Import Namespace = "System" />
+                <Import Namespace = "System.Collections" />
+                <Import Namespace = "System.Configuration" />
+                <Import Namespace = "System.Data" />
+                <Import Namespace = "System.Drawing" />
+                <Import Namespace = "System.Web" />
+                <Import Namespace = "System.Web.UI" />
+                <Import Namespace = "System.Web.UI.HtmlControls" />
+                <Import Namespace = "System.Web.UI.WebControls" />
+            </Imports>
+        </Build>
+        <Files>
+            <Include>
+                <File
+                    RelPath = "AssemblyInfo.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "cData.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "client_details.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "client_details.aspx.vb"
+                    DependentUpon = "client_details.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "client_details.aspx.resx"
+                    DependentUpon = "client_details.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "clients_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "clients_rbottom.aspx.vb"
+                    DependentUpon = "clients_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "clients_rbottom.aspx.resx"
+                    DependentUpon = "clients_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "clients_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "clients_rtop.aspx.vb"
+                    DependentUpon = "clients_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "clients_rtop.aspx.resx"
+                    DependentUpon = "clients_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Default.htm"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "Empired.vsdisco"
+                    BuildAction = "None"
+                />
+                <File
+                    RelPath = "Global.asax"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "Global.asax.vb"
+                    DependentUpon = "Global.asax"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Global.asax.resx"
+                    DependentUpon = "Global.asax.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "helpdesk_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "helpdesk_rbottom.aspx.vb"
+                    DependentUpon = "helpdesk_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "helpdesk_rbottom.aspx.resx"
+                    DependentUpon = "helpdesk_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "helpdesk_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "helpdesk_rtop.aspx.vb"
+                    DependentUpon = "helpdesk_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "helpdesk_rtop.aspx.resx"
+                    DependentUpon = "helpdesk_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "images_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "images_rtop.aspx.vb"
+                    DependentUpon = "images_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "images_rtop.aspx.resx"
+                    DependentUpon = "images_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "left.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "left.aspx.vb"
+                    DependentUpon = "left.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "left.aspx.resx"
+                    DependentUpon = "left.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "locator_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "locator_rbottom.aspx.vb"
+                    DependentUpon = "locator_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "locator_rbottom.aspx.resx"
+                    DependentUpon = "locator_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "locator_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "locator_rtop.aspx.vb"
+                    DependentUpon = "locator_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "locator_rtop.aspx.resx"
+                    DependentUpon = "locator_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Module1.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "package_details.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "package_details.aspx.vb"
+                    DependentUpon = "package_details.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "package_details.aspx.resx"
+                    DependentUpon = "package_details.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "package_status.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "package_status.aspx.vb"
+                    DependentUpon = "package_status.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "package_status.aspx.resx"
+                    DependentUpon = "package_status.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "package_timeentry.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "package_timeentry.aspx.vb"
+                    DependentUpon = "package_timeentry.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "package_timeentry.aspx.resx"
+                    DependentUpon = "package_timeentry.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "packaging_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "packaging_rbottom.aspx.vb"
+                    DependentUpon = "packaging_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "packaging_rbottom.aspx.resx"
+                    DependentUpon = "packaging_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "packaging_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "packaging_rtop.aspx.vb"
+                    DependentUpon = "packaging_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "packaging_rtop.aspx.resx"
+                    DependentUpon = "packaging_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "phonebook_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "phonebook_rbottom.aspx.vb"
+                    DependentUpon = "phonebook_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "phonebook_rbottom.aspx.resx"
+                    DependentUpon = "phonebook_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "phonebook_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "phonebook_rtop.aspx.vb"
+                    DependentUpon = "phonebook_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "phonebook_rtop.aspx.resx"
+                    DependentUpon = "phonebook_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "projects_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "projects_rbottom.aspx.vb"
+                    DependentUpon = "projects_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "projects_rbottom.aspx.resx"
+                    DependentUpon = "projects_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "projects_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "projects_rtop.aspx.vb"
+                    DependentUpon = "projects_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "projects_rtop.aspx.resx"
+                    DependentUpon = "projects_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "rbottom.aspx.vb"
+                    DependentUpon = "rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "rbottom.aspx.resx"
+                    DependentUpon = "rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "rtop.aspx.vb"
+                    DependentUpon = "rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "rtop.aspx.resx"
+                    DependentUpon = "rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "scheduling_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "scheduling_rbottom.aspx.vb"
+                    DependentUpon = "scheduling_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "scheduling_rbottom.aspx.resx"
+                    DependentUpon = "scheduling_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "scheduling_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "scheduling_rtop.aspx.vb"
+                    DependentUpon = "scheduling_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "scheduling_rtop.aspx.resx"
+                    DependentUpon = "scheduling_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "servers_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "servers_rbottom.aspx.vb"
+                    DependentUpon = "servers_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "servers_rbottom.aspx.resx"
+                    DependentUpon = "servers_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "servers_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "servers_rtop.aspx.vb"
+                    DependentUpon = "servers_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "servers_rtop.aspx.resx"
+                    DependentUpon = "servers_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "staff_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "staff_rbottom.aspx.vb"
+                    DependentUpon = "staff_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "staff_rbottom.aspx.resx"
+                    DependentUpon = "staff_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "staff_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "staff_rtop.aspx.vb"
+                    DependentUpon = "staff_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "staff_rtop.aspx.resx"
+                    DependentUpon = "staff_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Styles.css"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "tasks_rbottom.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "tasks_rbottom.aspx.vb"
+                    DependentUpon = "tasks_rbottom.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "tasks_rbottom.aspx.resx"
+                    DependentUpon = "tasks_rbottom.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "tasks_rtop.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "tasks_rtop.aspx.vb"
+                    DependentUpon = "tasks_rtop.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "tasks_rtop.aspx.resx"
+                    DependentUpon = "tasks_rtop.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Web.config"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "WebForm1.aspx"
+                    BuildAction = "Content"
+                />
+                <File
+                    RelPath = "WebForm1.aspx.vb"
+                    DependentUpon = "WebForm1.aspx"
+                    SubType = "ASPXCodeBehind"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "WebForm1.aspx.resx"
+                    DependentUpon = "WebForm1.aspx.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <Folder RelPath = "Images\" />
+            </Include>
+        </Files>
+    </VisualBasic>
+</VisualStudioProject>
+

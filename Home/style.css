@@ -1,0 +1,111 @@
+.Body 
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : normal;
+}
+Body 
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : normal;
+}
+.SmallText
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : normal;
+  font-size : small;
+	font : 7pt;
+}
+.SmallRedText
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : normal;
+  font-size : small;
+	font : 7pt;
+  color : red;
+}
+TR 
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : normal;
+	font-size : small;
+	font : 8pt;
+	background : white;
+}
+.TableBold
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-size : small;
+	font : 8pt;
+	font-weight : bold;
+	background : white;
+	color : gray;
+}
+.TableHere
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : small-caps;
+	font-size : small;
+	font : 8pt;
+	font-weight : bold;
+	background : white;
+}
+.TableNow1
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : small-caps;
+	font-size : small;
+	font : 8pt;
+	font-weight : bold;
+	background : Blue;
+	color : white;
+}
+.TableNow2
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : small-caps;
+	font-size : small;
+	font : 8pt;
+	font-weight : bold;
+	background : DarkBlue;
+	color : white;
+}
+.TableCol1
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : small-caps;
+	font-size : small;
+	font : 8pt;
+	font-weight : bold;
+	background : white;
+}
+.TableCol2
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : small-caps;
+	font-size : small;
+	font : 8pt;
+	font-weight : bold;
+	background : white;
+}
+.TableAway
+{
+	font-style : normal;
+	font-family : Tahoma;
+	font-variant : small-caps;
+	font-size : small;
+	font : 8pt;
+	font-weight : bold;
+	background : Gray;
+	color : white;
+}

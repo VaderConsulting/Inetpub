@@ -1,0 +1,122 @@
+Public Class clients_rbottom
+    Inherits System.Web.UI.Page
+
+#Region " Web Form Designer Generated Code "
+
+    'This call is required by the Web Form Designer.
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+
+    End Sub
+
+    Private Sub Page_Init(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Init
+        'CODEGEN: This method call is required by the Web Form Designer
+        'Do not modify it using the code editor.
+        InitializeComponent()
+    End Sub
+
+#End Region
+
+    Private Sub Page_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        SwitchPageMode()
+    End Sub
+
+    Private Sub SwitchPageMode()
+        Dim Mode As String
+        Dim Recordset As DataSet, Table As DataTable, Row As DataRow, Column As DataColumn
+
+        Mode = Page.Request.QueryString("Mode")
+
+        Select Case Mode
+            Case "add"
+                Response.Write("TODO: Add")
+            Case "delete"
+                Response.Write("TODO: Delete")
+            Case "all"
+                Recordset = GetData("sp_Clients")
+                DisplayAllClients(Recordset, 3)
+            Case "current"
+                Recordset = GetData("sp_CurrentClients")
+                DisplayCurrentClients(Recordset, 3)
+        End Select
+    End Sub
+
+    Private Sub DisplayAllClients(ByVal Recordset As DataSet, ByVal NoOfTableColumns As Int32)
+        Dim Table As DataTable, Row As DataRow
+        Dim TableColNumber As Int32
+        Dim ClientID As Int32, ClientName As String, ClientCurrent As Boolean
+
+        ' For each table in the DataSet, output the row values.
+        Table = Recordset.Tables(0)
+        Response.Write("<table align=""center"" cellspacing=""0"" cellpadding=""0"">" & ControlChars.CrLf)
+        Response.Write("    <tr>" & ControlChars.CrLf)
+        For Each Row In Table.Rows
+            TableColNumber = TableColNumber + 1
+
+            ClientID = Row.Item(0)
+            Clientname = Row.Item(1)
+            ClientCurrent = Row.Item(2)
+
+            Response.Write("        <td width=""200"" height=""20"" style=""cursor: hand;"" onclick=""javascript:setheader(" & ClientID & ");"">" & ClientName & "</td>" & ControlChars.CrLf)
+            ' <a href=""clients_rtop.aspx?add=false&delete=true&ClientID=" & ClientID & """ target=""rtop"">"</a>
+            Response.Write("        <td width=""40"" height=""20""><input type=""checkbox""")
+            If ClientCurrent Then
+                Response.Write(" checked")
+            End If
+            Response.Write(" onclick=""Save(" & ClientID & ")""></td>" & ControlChars.CrLf)
+
+            If TableColNumber = NoOfTableColumns Then
+                TableColNumber = 0
+                Response.Write("    </tr>" & ControlChars.CrLf)
+                Response.Write("    <tr>" & ControlChars.CrLf)
+            End If
+        Next Row
+        Response.Write("    </tr>" & ControlChars.CrLf)
+        Response.Write("</table>" & ControlChars.CrLf)
+    End Sub
+
+    Private Sub DisplayCurrentClients(ByVal Recordset As DataSet, ByVal NoOfTableColumns As Int32)
+        Dim Table As DataTable, Row As DataRow
+        Dim TableColNumber As Int32
+        Dim ClientID As Int32, ClientName As String, ClientCurrent As Boolean
+
+        ' For each table in the DataSet, output the row values.
+        Table = Recordset.Tables(0)
+        Response.Write("<table align=""center"" cellspacing=""0"" cellpadding=""0"">" & ControlChars.CrLf)
+        Response.Write("    <tr>" & ControlChars.CrLf)
+        For Each Row In Table.Rows
+            TableColNumber = TableColNumber + 1
+
+            ClientID = Row.Item(0)
+            Clientname = Row.Item(1)
+
+            Response.Write("        <td width=""200"" height=""20"" style=""cursor: hand;"" onclick=""javascript:setheader(" & ClientID & ");"">" & ClientName & "</td>" & ControlChars.CrLf)
+            'Response.Write("        <td width=""200"" height=""20""><a href=""clients_rtop.aspx?add=false&delete=true&ClientID=" & ClientID & """ target=""rtop"">" & ClientName & "</a></td>" & ControlChars.CrLf)
+            Response.Write("        <td width=""40"" height=""20"">&nbsp;</td>" & ControlChars.CrLf)
+
+            If TableColNumber = NoOfTableColumns Then
+                TableColNumber = 0
+                Response.Write("    </tr>" & ControlChars.CrLf)
+                Response.Write("    <tr>" & ControlChars.CrLf)
+            End If
+        Next Row
+        Response.Write("    </tr>" & ControlChars.CrLf)
+        Response.Write("</table>" & ControlChars.CrLf)
+    End Sub
+
+    'Public Function GetData(ByVal StoredProcedureName As String) As DataSet
+    '    Dim DataClass As New cData()
+    '    Dim Recordset As DataSet
+
+    '    'DataClass.DSN = "data source=LAPTOP;initial catalog=Empired;integrated security=SSPI;persist security info=False;workstation id=LAPTOP;packet size=4096"
+    '    DataClass.DSN = "data source=MAMMOTH02;initial catalog=Empired;password=REDACTED;persist security info=True;user id=REDACTED;workstation id=TUSKPRINT;packet size=4096"
+    '    Recordset = DataClass.Exec(StoredProcedureName, cData.DataTypes.StoredProcedure)
+
+    '    If DataClass.ReturnCode <> DataClass.DataError.NOERROR Then
+    '        Response.Write(DataClass.ErrorMessage & " (Data error " & DataClass.ReturnCode & ")<br>" & ControlChars.CrLf)
+    '        Exit Function
+    '    End If
+
+    '    Return Recordset
+    'End Function
+
+End Class

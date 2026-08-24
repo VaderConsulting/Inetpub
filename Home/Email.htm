@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<%
+UserTo = Request.QueryString("UserTo")
+%>
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='style.css'>
+  <title>Email</title>
+</head>
+
+<body>
+  
+
+
+</body>
+
+<script language="VBScript">
+
+Function SendMail(EmailAddressTo, EmailAddressFrom, Subject, Message)
+    Set objSendMail =     CreateObject("CDONTS.NewMail")
+    objSendMail.From =    EmailAddressFrom
+    objSendMail.To =      EmailAddressTo
+    objSendMail.Subject = Subject
+    objSendMail.Body =    Message
+    objSendMail.Send
+    Set objSendMail = Nothing
+End Function
+
+</script>
+
+</html>

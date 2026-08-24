@@ -1,0 +1,50 @@
+<!--#include file="Database.asp"-->
+<%
+
+  Dim rsUsers
+  Set rsUsers = Server.CreateObject("ADODB.Recordset")
+  rsUsers.Open "Users", objConn, adOpenForwardOnly, adLockOptimistic, adCmdTable
+
+If Request.Form("Update") = "TRUE" Then
+	rsUsers.Filter = "UserID = "REDACTED"UserID")
+Else
+
+  Dim rsUsernameSearch 
+  strSQL = "SELECT * FROM Users"
+  Set rsUsernameSearch = Server.CreateObject("ADODB.Recordset")
+  rsUsernameSearch.Open strSQL, objConn
+  
+  Do While Not rsUsernameSearch.EOF
+  
+  	If UCase(Request.Form("Username")) = UCase(rsUsernameSearch("Username")) Then
+		Response.Redirect "Register.asp?Username=False"
+	End If
+  rsUsernameSearch.MoveNext
+  Loop
+  rsUsernameSearch.close
+  Set rsUsernameSearch = Nothing
+
+  rsUsers.AddNew
+End If
+
+rsUsers("FirstName") = Request.Form("FirstName")
+rsUsers("LastName") = Request.Form("LastName")
+rsUsers("Username") = Request.Form("Username")
+rsUsers("EMailAddress") = Request.Form("EMailAddress")
+rsUsers("Password") = Request.Form("Password")
+rsUsers.Update
+
+rsUsers.Close
+Set rsUsers = Nothing
+If Request.Form("Update") = "TRUE" Then
+	Session("FirstName") = Request.Form("FirstName")
+	Session("LastName") = Request.Form("LastName")
+	Session("Username") = Request.Form("Username")
+	Session("EMailAddress") = Request.Form("EMailAddress")
+	Session("Password") = Request.Form("Password")
+	Response.Redirect "added.asp?Update=TRUE"
+Else
+	Response.Redirect "added.asp"
+End If
+
+%>

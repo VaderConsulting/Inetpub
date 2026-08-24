@@ -1,0 +1,22 @@
+Module ModMain
+
+    Public Function GetData(ByVal StoredProcedureName As String, Optional ByVal ErrorMessage As String = "") As DataSet
+        Dim DataClass As New cData()
+        Dim Recordset As DataSet
+
+        'DataClass.DSN = "data source=LAPTOP;initial catalog=Empired;integrated security=SSPI;persist security info=False;workstation id=LAPTOP;packet size=4096"
+        DataClass.DSN = "data source=MAMMOTH02;initial catalog=Empired;password=REDACTED;persist security info=True;user id=REDACTED;workstation id=TUSKPRINT;packet size=4096"
+        Recordset = DataClass.Exec(StoredProcedureName, cData.DataTypes.StoredProcedure)
+
+        If DataClass.ReturnCode <> DataClass.DataError.NOERROR Then
+            ErrorMessage = DataClass.ReturnCode & " - " & DataClass.ErrorMessage
+        End If
+        'Response.Write(DataClass.ErrorMessage & " (Data error " & DataClass.ReturnCode & ")<br>" & ControlChars.CrLf)
+        'Exit Function
+        'End If
+
+        Return Recordset
+    End Function
+
+
+End Module

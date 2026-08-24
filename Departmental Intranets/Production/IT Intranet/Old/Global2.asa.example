@@ -1,0 +1,33 @@
+<script language="vbscript" runat="server">
+
+sub Application_OnStart
+	
+	'define the root folder for the user-defined intranet documents
+	Application("Documents") = "ITSupportDocuments/"
+	
+	'define the email variables
+	Application("EmailFromAccount") = "redacted@example.com"
+	Application("EmailProcurementForm") = "redacted@example.com"
+	Application("EmailSMTPServer") = "10.0.9.32"
+	
+	Application("EmailITSupport") = "redacted@example.com"
+	Application("EmailWorkRequest") = "redacted@example.com; redacted@example.com"
+	
+	'define the Active Directory account settings
+	Application("ADServiceAccount") = "EXAMPLE\svc-example"
+	Application("ADServicePassword") = "example-password"
+end sub
+
+sub Application_OnEnd
+  'add some code
+end sub
+
+sub Session_OnStart
+  'add some code
+end sub
+
+sub Session_OnEnd
+  'add some code
+end sub
+
+</script>

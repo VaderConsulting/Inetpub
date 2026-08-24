@@ -1,0 +1,190 @@
+<html>
+<head>
+<%
+
+On Error Resume Next
+'Get Username
+Dim Usr, i
+Usr = UCase(Request.ServerVariables("AUTH_USER"))
+i = InStr(Usr,"\")
+Session("Username") = Mid(Usr,i+1,Len(Usr)-i)
+
+'Get QueryString values
+
+Dim Mode, Go
+Go = request.querystring ("cmdGo")
+If Go= "Go" then 
+    Mode = "Submit"
+Else
+    Mode = "Search"
+End If
+
+If Mode = "Submit" Then
+    Dim adoConn
+    Dim adoRS
+    Dim DSN, SQL
+    Dim First, Last, Position, Phone, Location,Section, ENumber
+    
+    Set adoConn = Server.CreateObject("ADODB.Connection")
+    Set adoRS = Server.CreateObject("ADODB.Recordset")
+    
+    'DSN = "Provider=SQLOLEDB.1;User ID=REDACTED;pwd=REDACTED;Initial Catalog=Dos_D;Data Source=DACTST06;Language=British English;"
+    DSN = CONST_CONNECTION_STRING
+    
+    ' Replace ' with '', and remove leading and trailing spaces
+    First = Replace(Trim(request.querystring ("First")),"'","''")
+    Last = Replace(Trim(request.querystring ("Last")),"'","''")
+    Position = Replace(Trim(request.querystring ("Position")),"'","''")
+    Phone = Replace(Trim(request.querystring ("Phone")),"'","''")
+    Location = Replace(Trim(request.querystring ("Location")),"'","''")
+    Section = Replace(Trim(request.querystring ("Section")),"'","''")
+    ENumber = Replace(Trim(request.querystring ("ENumber")),"'","''")
+    
+    'Ensure some input was provided
+    If First = "" And Last = "" And Position = "" And ENumber = "" And Location = "" and Section = "" Then 
+        Mode = "Search"
+        Set adoConn=Nothing
+        Set adoRS = Nothing
+    Else
+        adoConn.Open DSN
+        SQL = "SELECT Employees.*, Site.Name, Section.Name FROM "
+        SQL = SQL & "(Employees INNER JOIN Site ON Employees.CurrentSite = Site.SiteNum) INNER JOIN [Section] ON Employees.SectNum = Section.SectNum WHERE "
+        If First <> "" Then SQL = SQL & "Prefname LIKE '" & First & "%' AND "
+        If Last <> "" Then SQL = SQL & "Lastname LIKE '" & Last & "%' AND "
+        If Position <> "" Then SQL = SQL & "Position LIKE '" & Position & "%' AND "
+        If Phone <> "" Then SQL = SQL & "Phone LIKE '" & Phone & "%' AND "
+        If Location <> "" Then SQL = SQL & "Site.Name LIKE '" & Location & "%' "
+        If Section <> "" Then SQL = SQL & "Section.Name LIKE '" & Section & "%' "
+        If ENumber <> "" Then SQL = SQL & "EmpNum LIKE '" & ENumber & "%' "
+        
+        'Remove extraneous 'AND'
+        If Right(SQL,4) = "AND " Then SQL = left(SQL,Len(SQL)-4)
+        SQL = SQL & " ORDER BY Lastname, Prefname"
+    End If
+End If
+%>
+<title>Personal HomePages Search</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script language="JavaScript">
+<!--
+function MM_reloadPage(init) {  //reloads the window if Nav4 resized
+  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
+    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
+  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
+}
+MM_reloadPage(true);
+// -->
+</script>
+<style type="text/css">
+<!--
+.searchbottom {  border-color: black black #000000; border-style: solid; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 1px; border-left-width: 0px}
+.tops {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px}
+.bottom {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px; color: #999999}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<%
+Response.Write "<!--" & vbcrlf
+Response.Write "Mode: " & Mode & vbcrlf
+If Mode = "Submit" Then Response.Write "SQL statement: " & SQL & vbcrlf
+Response.Write "-->"
+%>
+<table width="44%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td height="57" width="19%"><img src="../images/SearchTopl.gif" width="234" height="128"></td>
+    <td height="57" width="81%"><img src="../images/MainTopR.gif" width="297" height="128" usemap="#Map" border="0"></td>
+  </tr>
+  <tr>
+    <td width="19%" height="275" valign="top" background="../images/bottoml.gif" style="background-repeat: no-repeat;">
+        <form action="default.asp" name="frmSearch" id="frmSearch">
+        <table>
+            <tr>
+                <td align="center" colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+                <td nowrap><font size="2" face="Arial, Helvetica, sans-serif" color="#666666">&nbsp;Pref. Name</font></td>
+                <td><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><input type="Text" size="20" name="First" Value="<%If First <> "" Then Response.Write First%>"></font></td>
+            </tr>
+            <tr>    
+                <td nowrap><font size="2" face="Arial, Helvetica, sans-serif" color="#666666">&nbsp;Last Name</font></td>
+                <td><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><input type="Text" size="20" name="Last" Value="<%If Last <> "" Then Response.Write Last%>"></font></td>
+            </tr>
+            <tr>    
+                <td nowrap><font size="2" face="Arial, Helvetica, sans-serif" color="#666666">&nbsp;Position Title</font></td>
+                <td><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><input type="Text" size="20" name="Position" Value="<%If Position <> "" Then Response.Write Position%>"></font></td>
+            </tr>
+            <tr>    
+                <td nowrap><font size="2" face="Arial, Helvetica, sans-serif" color="#666666">&nbsp;E/C. Number</font></td>
+                <td><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><input type="Text" size="20" name="ENumber" Value="<%If ENumber <> "" Then Response.Write ENumber%>"></font></td>
+            </tr>
+            <tr>    
+                <td nowrap><font size="2" face="Arial, Helvetica, sans-serif" color="#666666">&nbsp;Location</font></td>
+                <td><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><input type="Text" size="20" name="Location" Value="<%If Location <> "" Then Response.Write Location%>"></font></td>
+            </tr>
+            <tr>    
+                <td align="center">&nbsp;</td>
+                <td align="center"><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><input type="Submit" name="cmdGo" value="Go"></font></td>
+            </tr>
+        </table>
+        </form>
+    </td>
+    <%
+    If Mode = "Submit" Then%>
+    <td height="275" width="81%" valign="top"> 
+      <p class="bottom"><br>
+        &nbsp;&nbsp;<font size="2" face="Arial, Helvetica, sans-serif" color="#666666">Results:</font></p>
+      <table width="80%" border="0" cellspacing="0" cellpadding="0" align="center" class="searchbottom">
+        <%
+        adoRS.Open SQL, adoConn
+        If adors.eof Then
+            Response.Write "<font size='2' face='Tahoma'>No records match your search criteria.</font>"
+        End If
+        Do Until adoRS.EOF
+            %>
+            <tr>
+              <td><a href="create.asp?ENumber=<%=Trim(adoRS("EmpNum"))%>" class="tops"><%=Trim(adoRS("EmpNum"))%></a></td>
+            </tr>
+            <tr>
+              <td class="bottom" nowrap><%=Trim(adoRS("PrefName")) & " " & Trim(adoRS("Lastname")) & " - " & Trim(adoRS("Position"))%></td>
+            </tr>
+          <%
+          adoRS.Movenext
+      Loop
+      %>
+      </table>
+    </td>
+    <%End If
+    %>
+  </tr>
+</table>
+<div id="Layer1" style="position:absolute; left:245px; top:62px; width:273px; height:63px; z-index:1; cursor:hand" onClick="vbscript:DoHome">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+<tr>
+    <td class="bottom">&nbsp;</td>
+</tr>
+<tr>
+    <td align="center"class="bottom" style="position:absolute; left:80px; top:25px;"><font size="2" face="Tahoma" color="#ffffff">My Homepage</font></td>
+</tr>
+<tr>
+    <td class="bottom">&nbsp;</td>
+</tr>
+</table>
+</div>
+</body>
+<%
+    If Mode = Submit Then
+        adoConn.Close
+        Set adoRS = Nothing
+        Set adoConn = Nothing
+    End If
+%>
+<script language="VBScript">
+
+Sub DoHome()
+    window.location.href= "create.asp?Enumber=<%=Session("username")%>"
+End Sub
+
+</script>
+</html>

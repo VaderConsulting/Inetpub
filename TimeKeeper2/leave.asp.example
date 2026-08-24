@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<title>Leave</title>
+</head>
+
+<body>
+<%
+'Get Username
+'Dim Usr, I
+Dim adoConn, adoRS, SQL
+'Usr = UCase(Request.ServerVariables("AUTH_USER"))
+'i = InStr(Usr,"\")
+'Session("Username") = Mid(Usr,i+1,Len(Usr)-i)
+'Response.Write "Username: "REDACTED"Username") & "<br>" & vbcrlf
+'DSN = "Provider=SQLOLEDB.1;User ID=REDACTED;Initial Catalog=Timekeeper;Data Source=(Local);Language=British English;"
+'DSN = "Provider=SQLOLEDB.1;User ID=REDACTED;pwd=REDACTED;Initial Catalog=Process_Control_Data;Data Source=mammoth02;Language=British English;"
+set adoConn = Server.Createobject("adodb.Connection")
+Set adoRS = Server.CreateObject("adodb.Recordset")
+SQL = "SELECT UserID FROM UserDetails WHERE UPPER(Username) = '" & Session("Username") & "'"
+'adoConn.Open DSN
+'adoRS.Open SQL, adoConn
+'Response.Write "UserID: "REDACTED"UserID") & "<br>" & vbcrlf
+'adoRS.Close
+%>
+<script language='VBScript'>
+    Sub Add (Source)
+        pp = instr(CStr(Source),"day") + 3
+        pp2 = mid(CStr(Source),pp,4)
+        DayOfWeek = Left(CStr(Source),pp-1)
+        document.all.Item(Source).InnerHTML = "<font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick=""VBScript:Edit('" & DayOfWeek &  "" & pp2 & "')"">Busy</font>"
+    End Sub
+    
+    Sub Edit (Source)
+        pp = instr(CStr(Source),"day") + 3
+        pp2 = mid(CStr(Source),pp,4)
+        DayOfWeek = Left(CStr(Source),pp-1)
+        document.all.Item(Source).InnerHTML = "<font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick=""VBScript:Add('" & DayOfWeek &  "" & pp2 & "')"">...</font>"
+    End Sub
+</script>
+<p>
+<table border='1' cellspacing='0' cellpadding='0' align='left'>
+    <tr>
+        <td align='center' width='50'>&nbsp;</td>
+        <td align='center' width='100'>Monday</td>
+        <td align='center' width='100'>Tuesday</td>
+        <td align='center' width='100'>Wednesday</td>
+        <td align='center' width='100'>Thursday</td>
+        <td align='center' width='100'>Friday</td>
+    </tr>
+<%
+For i = 8 to 18
+    If Len(i) = 1 Then
+        ii = "0" & i
+    Else
+        ii = Cstr(i)
+    End If
+%>
+    <tr>
+        <td>&nbsp;<%=ii%>:00</td>
+        <td align='right'><span id="Monday<%=i%>"><font face="Tahoma" size="1" color="Red" style="cursor: hand;" onClick="VBScript:Add('Monday<%=i%>')">...</font></span></td>
+        <td align='right'><span id="Tuesday<%=i%>"><font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick="VBScript:Add('Tuesday<%=i%>')">...</font></span></td>
+        <td align='right'><span id="Wednesday<%=i%>"><font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick="VBScript:Add('Wednesday<%=i%>')">...</font></span></td>
+        <td align='right'><span id="Thursday<%=i%>"><font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick="VBScript:Add('Thursday<%=i%>')">...</font></span></td>
+        <td align='right'><span id="Friday<%=i%>"><font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick="VBScript:Add('Friday<%=i%>')">...</font></span></td>
+    </tr>
+    <tr>
+        <td>&nbsp;<%=ii%>:30</td>
+        <td align='right'><span id="Monday<%=i%>30"><font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick="VBScript:Add('Monday<%=i%>30')">...</font></span></td>
+        <td align='right'><span id="Tuesday<%=i%>30"><font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick="VBScript:Add('Tuesday<%=i%>30')">...</font></span></td>
+        <td align='right'><span id="Wednesday<%=i%>30"><font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick="VBScript:Add('Wednesday<%=i%>30')">...</font></span></td>
+        <td align='right'><span id="Thursday<%=i%>30"><font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick="VBScript:Add('Thursday<%=i%>30')">...</font></span></td>
+        <td align='right'><span id="Friday<%=i%>30"><font face='Tahoma' size='1' color='Red' style='cursor: hand;' onclick="VBScript:Add('Friday<%=i%>30')">...</font></span></td>
+    </tr>
+<%
+Next
+%>
+</table>
+</p>
+<%
+'SQL = "SELECT DISTINCT ClientName, ClientID FROM Client ORDER BY ClientName"
+Response.Write "Select a Client from the following list:<br>" & vbcrlf
+%>
+
+<form name='frmInput'>
+<select name="cmbClient" id="cmbClient" size="1">
+
+<%
+'adoRS.Open SQL, adoConn
+'Do Until adoRS.EOF
+'    Response.Write "<option value='" & adoRS("ClientName") & "'>" & adoRS("ClientName") & " (" & adoRS("ClientID") & ")" & vbcrlf
+'    adoRS.MoveNext
+'Loop
+%>
+</select>
+</form>
+<%
+Set adoRS = Nothing
+Set adoConnection = Nothing
+%>
+</body>
+</html>

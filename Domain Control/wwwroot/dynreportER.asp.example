@@ -1,0 +1,236 @@
+<%
+  Hostname = UCase(Request.QueryString("hostname"))
+  Set CSCConn = CreateObject("ADODB.Connection")
+  Server.ScriptTimeout = 900
+  CSCConn.CommandTimeout = 720
+  CSCConn.Open "Provider=SQLOLEDB.1;UID=REDACTED;PWD=;Persist Security Info=False;Initial Catalog=Insight_DB_v2;Data Source=Perth-mon-2"
+  Set CSCDB1 = CreateObject("ADODB.Recordset")
+	
+	NumDLetters = 3
+	Dim DLetters(3),DSpace(3),DTotal(3),MaxSpace(3)
+
+'Here we parse the request string from the form
+
+	'servername = Request.QueryString("servername")
+	servername = "PERTH-DATA-1"
+	'servermonth = Request.QueryString("servermonth")
+	servermonth = 10
+	'serverpollid = Request.QueryString("serverpollid")
+	serverpollid = 17
+	'serverinstance = Request.QueryString("serverinstance")
+	serverinstance = 1
+
+
+	select case serverpollid
+		case 17
+		  graphtitle = "CPU"
+	 	  yaxistitle = "Percent"
+	 	case 21
+		  graphtitle = "Disk"
+	 	  yaxistitle = "Percent"
+	 	case 37
+		  graphtitle = "Uptime"
+	 	  yaxistitle = "Percent"
+	end select	 	
+	
+	xaxistitle = "Date"
+	instancetitle = "Instance " & serverinstance
+
+SQL = "SELECT COUNT (dbo.DC_HistoricalOutput.DataValue) as totalrows FROM dbo.DC_HistoricalOutput  INNER JOIN "
+SQL = SQL & "    dbo.deviceNames ON "
+SQL = SQL & "    dbo.DC_HistoricalOutput.DeviceKey = dbo.deviceNames.DeviceKey "
+SQL = SQL & "WHERE (dbo.DC_HistoricalOutput.PollId = " & serverpollid & ") AND "
+'SQL = SQL & "    (dbo.DC_HistoricalOutput.DataValue > 0) AND "
+if serverpollid < 37 then
+  SQL = SQL & "    (dbo.DC_HistoricalOutput.IndexInstance = '" & serverinstance & "') AND "
+end if
+SQL = SQL & "    (dbo.deviceNames.nameSNMP = '" & servername & "') AND (MONTH(DBO.dc_hISTORICALoUTPUT.timestamp) = " & servermonth & ")"
+
+CSCDB1.Open SQL,CSCConn
+
+totalrowsinc = CSCDB1("totalrows") 
+
+CSCDB1.Close 
+%>
+
+
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<title>Disk Space Graph for <%= totalrowsinc %></title>
+</head>
+<body>
+Disk Space Graph for <%= totalrowsinc %>
+<script language="VBScript">
+  maxentry = 0
+  minentry = 0
+
+'Dim Categories(<%= totalrowsinc %>),MaxDiskSpace(2)
+Dim Categories(<%= totalrowsinc %>)
+Dim MaxDiskSpace(2)
+Dim CatNum
+
+'dim maxentry as long
+Dim UsedC(<%= totalrowsinc %>)
+
+'maxentry = 0
+Sub PopulateChart
+dim i
+  Dte = CDate("<%= 31 & " " & MonthName(5,True) & " " & 2001 %>")
+'  Dte = CDate("<%= Day(Now) & " " & MonthName(Month(Now),True) & " " & Year(Now) %>")
+  For i = 1 to <%= totalrowsinc %>
+	  Categories(i) = CStr(Day(Dte)) + " " + MonthName(Month(Dte),True) + CSTR(Year(dte))
+  	  Dte = Dte - 1 
+  Next
+  For i = 1 to <%= totalrowsinc %>
+      Usedc(i) = 0
+  Next
+  for i = 1 to <%= NumDLetters - 1 %>
+    MaxDiskSpace(i) = 0
+	next
+
+<% 
+
+
+SQL = "SELECT dbo.deviceNames.nameSNMP, "
+SQL = SQL & "    dbo.DC_HistoricalOutput.DataValue as figurex, "
+SQL = SQL & "    dbo.DC_HistoricalOutput.TimeStamp as dtime "
+'SQL = SQL & "    convert(varchar,dbo.DC_HistoricalOutput.TimeStamp,103) as dtime "
+SQL = SQL & "FROM dbo.DC_HistoricalOutput INNER JOIN "
+SQL = SQL & "    dbo.deviceNames ON "
+SQL = SQL & "    dbo.DC_HistoricalOutput.DeviceKey = dbo.deviceNames.DeviceKey "
+SQL = SQL & "WHERE (dbo.DC_HistoricalOutput.PollId = " & serverpollid & ") AND "
+if serverpollid < 37 then
+   SQL = SQL & "    (dbo.DC_HistoricalOutput.IndexInstance = '" & serverinstance & "') AND "
+end if
+'SQL = SQL & "    (dbo.DC_HistoricalOutput.DataValue > 0) AND "
+SQL = SQL & "    (dbo.deviceNames.nameSNMP = '" & servername & "') AND " 
+SQL = SQL & "    (MONTH(dbo.DC_HistoricalOutput.TimeStamp) = " & servermonth & ")"
+SQL = SQL & "ORDER by dtime"
+
+
+%>
+' Start Data Set   
+<%
+
+CSCDB1.Open SQL,CSCConn
+x = 0
+Do While Not CSCDB1.EOF
+	x = x + 1
+%>  UsedC(<%= x %>) = <%= CSCDB1("figurex") %> 
+	if <%= CSCDB1("figurex") %> > maxentry then maxentry = <%= CSCDB1("figurex") %>
+	Categories(<%= x %>) = "<%= CSCDB1("dtime") %>"
+    if x = 300 then msgbox(Categories(x))
+<%  cscdb1.movenext
+loop
+
+'CatNum = CStr(Day(Categories(1))) + " " + MonthName(Month(Categories(1)),True) + CSTR(Year(Categories(1)))
+
+CSCDB1.Close
+%>
+
+	if maxentry = 0 then maxentry = 100
+	if maxentry < 15 then maxentry = 15
+' End Data Set   '
+
+
+End Sub
+
+Sub SetupChart
+  PopulateChart
+
+  ''Init Objects
+  chart_Main.Clear
+  Set CConst = chart_main.Constants
+
+  if <%= totalrowsinc %> > 0 then
+  
+   chart_Main.Charts.Add
+    
+    'Add Serieses'
+    chart_Main.Charts(0).SeriesCollection.Add
+    
+    'Series 0 is C'
+    chart_Main.Charts(0).SeriesCollection(0).Caption = "<%= instancetitle %>" '"CPU (%)"'
+    chart_Main.Charts(0).SeriesCollection(0).SetData CConst.chDimCategories, CConst.chDataLiteral, Categories
+    chart_Main.Charts(0).SeriesCollection(0).SetData CConst.chDimValues, CConst.chDataLiteral, UsedC
+  
+  
+    ''Setup Chart Global Values  
+    chart_Main.Charts(0).HasLegend = True
+    chart_Main.Charts(0).Type = CConst.chChartTypeLine
+    chart_Main.Border.Color = RGB(255,255,255)
+    chart_Main.Charts(0).Axes(CConst.chAxisPositionLeft).NumberFormat = "0"
+    chart_Main.Charts(0).Axes(CConst.chAxisPositionLeft).MajorUnit = 10
+    chart_main.Charts.Item(0).HasTitle = True
+    chart_main.Charts.Item(0).Title.Caption = "<%= graphtitle %>" '"CPU Utilisation (C:)"'
+
+  	<%
+	  if totalrowsinc < 1 then 
+	    majunit = 10
+	  else
+	    majunit = totalrowsinc 
+	  end if
+	%>
+
+'This is the VALUE axis
+    chart_main.Charts.Item(0).Axes.Item(0).Font.Size = 7
+'    chart_main.Charts.Item(0).Axes.Item(0).Scaling.Maximum = 100 ''maxentry * 1.09  'This is the height of the graph'
+    chart_main.Charts.Item(0).Axes.Item(0).Scaling.Maximum = 100 ''maxentry * 1.20  'This is the height of the graph'
+    chart_main.Charts.Item(0).Axes.Item(0).MajorUnit = 10 ''maxentry \ 15
+    chart_main.Charts.Item(0).Axes.Item(0).HasTitle = True
+    chart_main.Charts.Item(0).Axes.Item(0).Title.Caption = "<%= yaxistitle %>" '"Pct (%)"'
+'    chart_main.Charts.Item(0).Axes.Item(0).TickMarkSpacing = 5
+'    chart_main.Charts.Item(0).Axes.Item(0).TickLabelSpacing = 12
+  	
+
+'This is the CATEGORY axis
+	no_of_x_labels = 4
+    chart_main.Charts.Item(0).Axes.Item(1).Font.Size = 7
+    chart_main.Charts.Item(0).Axes.Item(1).HasTickLabels = False
+    chart_main.Charts.Item(0).Axes.Item(1).TickLabelSpacing = <%= totalrowsinc %> / no_of_x_labels
+'    chart_main.Charts.Item(0).Axes.Item(1).TickLabelSpacing = 400
+    chart_main.Charts.Item(0).Axes.Item(1).TickMarkSpacing = <%= totalrowsinc %> / (no_of_x_labels * 5)
+    chart_main.Charts.Item(0).Axes.Item(1).HasMajorGridlines = true
+    chart_main.Charts.Item(0).Axes.Item(1).HasMinorGridlines = true
+	chart_main.Charts.Item(0).Axes.Item(1).HasAutoMajorUnit = FALSE
+	chart_main.Charts.Item(0).Axes.Item(1).HasAutoMinorUnit = True
+    chart_main.Charts.Item(0).Axes.Item(1).MajorUnit = <%= majunit %> / no_of_x_labels
+    ' chart_main.Charts.Item(0).Axes.Item(1).MajorUnit = 200
+    chart_main.Charts.Item(0).Axes.Item(1).MajorGridlines.Line.Color = RGB(127,127,127)
+    chart_main.Charts.Item(0).Axes.Item(1).MinorGridlines.Line.Color = RGB(200,200,200)
+    chart_main.Charts.Item(0).Axes.Item(1).HasTitle = True
+    chart_main.Charts.Item(0).Axes.Item(1).Title.Caption = "<%= xaxistitle %>" '"Date"'
+
+  end if
+  
+End Sub
+
+Sub Window_OnLoad
+  SetupChart
+End Sub
+
+</script>
+	<div align="left">
+  <%= servername %><br>
+  Month: <%= servermonth %><br>
+  Category: <%= CatNum %>
+  <P>
+  <OBJECT
+	  CLASSID="CLSID:0002E500-0000-0000-C000-000000000046"
+	  ID="chart_main"
+	  STYLE="width:100%;height:300">
+	</OBJECT>
+	<Table border=1 width=100% cellpadding=0 cellspacing=0>
+	<Tr>
+	<Td align=center width=25%>Category 1</TD><Td align=center width=25%>Category 2</TD><Td align=center width=25%>Category 3</TD><Td align=center width=25%>Category 4</TD>
+  </div>
+  </Table>
+  </P>
+<FORM><CENTER>
+<INPUT TYPE="button" VALUE="Print" onClick="window.print()"></CENTER>
+</FORM>
+</body>
+</html>
+
+

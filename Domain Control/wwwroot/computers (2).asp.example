@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<META HTTP-EQUIV="REFRESH" CONTENT='300'>
+<!--#include file="styles.inc"-->
+<head>
+	<title>Domain Control</title>
+</head>
+
+<body>
+<SCRIPT LANGUAGE="VBScript" FOR="Window" EVENT="OnLoad">
+    parent.frames.item(1).window.location.href="left.asp?referringpage=Computers"
+</SCRIPT>
+
+</script>
+<%
+    response.expires = 5
+    Dim SQL
+    Dim DSN
+    Dim adoRS
+    Dim adoConn
+    Dim SQLServer
+    Dim Username
+    Dim Password
+    Dim Domainname
+    Dim i
+    Dim NoOfColumns
+    Dim ColumnWidth
+    
+    Domainname = Request.Querystring("Domainname")
+    Response.Write "<div align='center'>" & vbcrlf
+    If Domainname <> "" Then
+        Response.Write "<h1>" & Domainname & "</h1>" & vbcrlf
+    Else
+        Response.Write "<h1>All Computers</h1>" & vbcrlf
+    End If
+    Response.Write "</div>" & vbcrlf
+    Response.Write "<hr>" & vbcrlf
+    
+    'parent.frames.item(1).window.location.href="left.asp?referringpage=Computers"
+    
+    NoOfColumns = 3
+    ColumnWidth = 150
+    
+    Set adoConn = Server.CreateObject("ADODB.Connection")
+    Set adoRS = Server.CreateObject("ADODB.Recordset")
+    
+    SQLServer = "(Local)"
+    Username = "REDACTED"
+    Password = ""
+    
+    DSN = "Provider=SQLOLEDB.1;User ID="REDACTED";Initial Catalog=Domain Control;Data Source=" & SQLServer
+    
+    adoConn.Open DSN
+    SQL = "SELECT * FROM tblHosts "
+    If Domainname <> "" Then
+        SQL = SQL & "WHERE (IP <> '' AND IP <> 'NULL') AND Domainname = '"  & Domainname & "' "
+    Else
+        SQL = SQL & "WHERE IP <> '' AND IP <> 'NULL' "
+    End If
+    SQL = SQL & "ORDER BY Hostname"
+    'SQL = "SELECT * FROM tblHosts ORDER BY Hostname"
+    adoRS.Open SQL, adoConn
+
+    Response.Write "<table align='center'>"
+    Response.Write "    <tr>"
+
+    Do Until adoRS.EOF
+        i = i + 1 ' Counter for table structure
+        'Response.Write "        <td><image src = 'images/properties.gif' alt = '" & adoRS("IP") & "'>&nbsp;</td>" & vbcrlf
+        Response.Write "        <td nowrap><a href='hostinfo.asp?Hostname=" & adoRS("Hostname") & "' target='_self'>" & adoRS("Hostname") & "</a></td>" & vbcrlf
+        Response.Write "        <td nowrap width = '" & ColumnWidth & "'>"
+        If Instr(1,Ucase(adoRS("Type")),"2000") <> 0 Then Response.Write "<image src = 'images/windows_2000.gif' alt = 'Windows 2000' width='18'>"
+        If Instr(1,Ucase(adoRS("Type")),"NT") <> 0 Then Response.Write "<image src = 'images/windows_nt.gif' alt = 'Windows NT' width='18'>"
+        If Instr(1,Ucase(adoRS("Type")),"XP") <> 0 Then Response.Write "<image src = 'images/windows_xp.gif' alt = 'Windows XP' width='18'>"
+        If adoRS("Type") & "" = "" Then 
+            If adoRS("isUnix") = 0 Then 
+                Response.Write "<image src = 'images/windows_unknown.gif' alt = 'Unknown OS' width='18'>"
+            Else
+                Response.Write "<image src = 'images/sun.gif' alt = 'Unix' width='18'>"
+            End If
+        End If
+            
+        If adoRS("isUp") Then
+            If adoRS("isPDC") Then Response.Write "<image src = 'images/pdc.gif' alt = 'PDC' width='18'>"
+            If adoRS("isDC") Then Response.Write "<image src = 'images/dc.gif' alt = 'BDC' width='18'>"
+            If adoRS("isPrint") Then Response.Write "<image src = 'images/netprinter.gif' alt = 'Print' width='18'>"
+            If adoRS("isSQL") Then Response.Write "<image src = 'images/server_database.gif' alt = 'SQL' width='18'>"
+            If adoRS("isBrowser") Then Response.Write "<image src = 'images/server_browser.gif' alt = 'Browser' width='18'>"
+            If adoRS("isTime") Then Response.Write "<image src = 'images/time-server.gif' alt = 'Time Source' width='18'>"
+            If adoRS("isTS") Then Response.Write "<image src = 'images/server_ts.gif' alt = 'Terminal Server' width='18'>"
+            If adoRS("isMSCS") Then Response.Write "<image src = 'images/cluster.gif' alt = 'MSCS' width='18'>"
+            If Trim(adoRS("Type") & "" ) <> "" Then
+                If Instr(1,UCASE(adoRS("Type")),"SERVER") > 0 Then
+                    If Instr(1,UCASE(adoRS("Type")),"ADVANCED") > 0 Then
+                        Response.Write "<image src = 'images/advanced_server.gif' alt = 'Advanced Server' width='18'>"
+                    Else
+                        Response.Write "<image src = 'images/server.gif' alt = 'Server' width='18'>"
+                    End If
+                Else
+                    Response.Write "<image src = 'images/workstation.gif' alt = 'Workstation' width='18'>"
+                End If
+            Else
+                'Response.Write "<image src = 'images/unsupported.gif' alt = 'Unknown OS' width='18'>"
+            End If
+        Else
+            If adoRS("isPDC") Then Response.Write "<image src = 'images/problem_pdc.gif' alt = 'PDC' width='18'>"
+            If adoRS("isDC") Then Response.Write "<image src = 'images/problem_dc.gif' alt = 'BDC' width='18'>"
+            If adoRS("isPrint") Then Response.Write "<image src = 'images/problem_netprinter.gif' alt = 'Print' width='18'>"
+            If adoRS("isSQL") Then Response.Write "<image src = 'images/problem_server_database.gif' alt = 'SQL' width='18'>"
+            If adoRS("isBrowser") Then Response.Write "<image src = 'images/problem_server_browser.gif' alt = 'Browser' width='18'>"
+            'If adoRS("isUnix") Then Response.Write "<image src = 'images/problem_server_unix.gif' alt = 'Unix' width='18'>"
+            If adoRS("isTS") Then Response.Write "<image src = 'images/problem_server_ts.gif' alt = 'Terminal Server' width='18'>"
+            If adoRS("isMSCS") Then Response.Write "<image src = 'images/problem_cluster.gif' alt = 'MSCS' width='18'>"
+            If Trim(adoRS("Type") & "" ) <> "" Then
+                If Instr(1,UCASE(adoRS("Type")),"SERVER") > 0 Then
+                    If Instr(1,UCASE(adoRS("Type")),"ADVANCED") > 0 Then
+                        Response.Write "<image src = 'images/problem_advanced_server.gif' alt = 'Advanced Server' width='18'>"
+                    Else
+                        Response.Write "<image src = 'images/problem_server.gif' alt = 'Server' width='18'>"
+                    End If
+                Else
+                    Response.Write "<image src = 'images/problem_workstation.gif' alt = 'Workstation' width='18'>"
+                End If
+            Else
+                'Response.Write "<image src = 'images/problem_unsupported.gif' alt = 'Unknown OS' width='18'>"
+            End If
+        End If
+        Response.Write "</td>" & vbcrlf
+        
+        If i / NoOfColumns = i \ NoOfColumns Then
+            Response.Write "    </tr>" & vbcrlf
+            Response.Write "    <tr>" & vbcrlf
+        End If
+        adoRS.Movenext
+    Loop
+    Response.Write "<br>" & vbcrlf
+    Response.Write "        </tr>" & vbcrlf
+    Response.Write "    </table>" & vbcrlf
+    Response.Write "<br>" & vbcrlf
+    Response.Write "<br>" & vbcrlf
+    Response.Write "<div align='center'>" & vbcrlf
+    Response.Write "&nbsp;" & i & "&nbsp;Hosts listed." & vbcrlf
+    Response.Write "</div>" & vbcrlf
+    Response.Write "<hr>" & vbcrlf
+    Response.Write "<table align='center' border='0' cellpadding='0' cellspacing='0'>" & vbcrlf
+    Response.Write "    <tr>" & vbcrlf
+    Response.Write "        <td colspan='8' align='center'><strong>Legend</strong><br><hr></td>" & vbcrlf
+    Response.Write "    </tr>" & vbcrlf
+    Response.Write "    <tr>" & vbcrlf
+    Response.Write "        <td align='right'>Windows 2000&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/windows_2000.gif' alt = 'Windows 2000' width='18'></td>"
+    Response.Write "        <td align='right'>Windows NT&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/windows_nt.gif' alt = 'Windows NT' width='18'></td>"
+    Response.Write "        <td align='right'>Windows XP&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/windows_xp.gif' alt = 'Windows XP' width='18'></td>"
+    Response.Write "        <td align='right'>Unknown Windows&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/windows_unknown.gif' alt = 'Unknown Windows Version' width='18'></td>"
+    Response.Write "    </tr>" & vbcrlf
+    Response.Write "    <tr>" & vbcrlf
+    Response.Write "        <td align='right'>PDC&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/pdc.gif' alt = 'PDC' width='18'></td>"
+    Response.Write "        <td align='right'>BDC&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/dc.gif' alt = 'BDC' width='18'></td>"
+    Response.Write "        <td align='right'>Print Server&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/netprinter.gif' alt = 'Print Server' width='18'></td>"
+    Response.Write "        <td align='right'>SQL Server&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/server_database.gif' alt = 'SQL Server' width='18'></td>"
+    Response.Write "    </tr>" & vbcrlf
+    Response.Write "    <tr>" & vbcrlf
+    Response.Write "        <td align='right'>Browse Server&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/server_browser.gif' alt = 'Browse Server' width='18'></td>"
+    Response.Write "        <td align='right'>Terminal Server&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/server_ts.gif' alt = 'Terminal Server' width='18'></td>"
+    Response.Write "        <td align='right'>Cluster Server&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/cluster.gif' alt = 'Cluster Server' width='18'></td>"
+    Response.Write "        <td align='right'>Unix Server&nbsp;</td>" & vbcrlf
+    Response.Write "        <td width='20'><image src = 'images/sun.gif' alt = 'Unix' width='18'></td>"
+    Response.Write "    </tr>" & vbcrlf
+    Response.Write "    <tr>" & vbcrlf
+    Response.Write "        <td align='right'>Time Server&nbsp;</td>" & vbcrlf
+    Response.Write "        <td align='right'><image src = 'images/time-server.gif' alt = 'Time Server' width='18'></td>"
+    Response.Write "        <td align='right'>Workstation&nbsp;</td>" & vbcrlf
+    Response.Write "        <td align='right'><image src = 'images/workstation.gif' alt = 'Workstation' width='18'></td>"
+    Response.Write "        <td align='right'>Server&nbsp;</td>" & vbcrlf
+    Response.Write "        <td align='right'><image src = 'images/server.gif' alt = 'Server' width='18'></td>"
+    Response.Write "        <td align='right'>Advanced Server&nbsp;</td>" & vbcrlf
+    Response.Write "        <td align='right'><image src = 'images/advanced_server.gif' alt = 'Advanced Server' width='18'></td>"
+    Response.Write "    </tr>" & vbcrlf
+    Response.Write "</table>" & vbcrlf
+    adoRS.Close
+    adoConn.Close
+%>
+<a href="javascript:history.back(1)">Back</a>
+</body>
+</html>
+<%
+    Set adoRS = Nothing
+    Set adoConn = Nothing
+%>
+

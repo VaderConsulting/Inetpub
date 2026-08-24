@@ -1,0 +1,70 @@
+.BodyText
+{
+    FONT-SIZE: 10px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+.WarningText
+{
+    FONT-WEIGHT: bolder;
+    FONT-SIZE: 12px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+.SectionHeaderText
+{
+    FONT-WEIGHT: bolder;
+    FONT-SIZE: 16px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+.ColumnHeaderText
+{
+    FONT-WEIGHT: bolder;
+    FONT-SIZE: 12px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+.SmallText
+{
+    FONT-SIZE: 10px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+.InvisibleSpan
+{
+    DISPLAY: none;
+    VISIBILITY: hidden
+}
+.bodtext
+{
+    FONT-SIZE: 12px;
+    COLOR: #996633;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif;
+    TEXT-DECORATION: none
+}
+.textbox
+{
+    BORDER-RIGHT: #999933 thin solid;
+    BORDER-TOP: #999933 thin solid;
+    FONT-SIZE: 10px;
+    BORDER-LEFT: #999933 thin solid;
+    COLOR: black;
+    BORDER-BOTTOM: #999933 thin solid;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+BODY
+{
+    BACKGROUND-POSITION: left top;
+    BACKGROUND-ATTACHMENT: fixed;
+    BACKGROUND-IMAGE: none;
+    BACKGROUND-REPEAT: no-repeat
+}
+.blockbg
+{
+    BACKGROUND-POSITION: right bottom;
+    BACKGROUND-ATTACHMENT: fixed;
+    BACKGROUND-IMAGE: url(../../Images/swish.gif);
+    BACKGROUND-REPEAT: no-repeat
+}
+

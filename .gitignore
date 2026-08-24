@@ -1,0 +1,101 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Legacy source-control bindings
+*.scc
+*.vssscc
+*.vspscc
+
+# NuGet
+packages/
+
+
+# Secrets / credentials (never upload)
+*.pfx
+*.p12
+*.pem
+*.key
+.env
+**/appsettings.*.local.json
+# Logs and temp
+*.log
+*.tmp
+*.bak
+
+# Redacted originals (see *.example files)
+playtag/RecoverPassword.aspx
+playtag/web.config
+playtag/RecoverPassword.aspx.vb
+TimeKeeper2/entries.asp
+TimeKeeper2/global.asa
+TimeKeeper2/leave.asp
+DataService/Web.config
+DataService/Web (2).config
+Timer/Web.config
+TOMSMonitor/Wwwroot/include/db.inc
+PersonalHomepages/Includes/constants.asp
+PersonalHomepages/Includes/backup/constants.asp
+PersonalHomepages/Homepages/default.asp
+WebService1/Web.config
+Wol/index.asp
+Wol/fra_index.asp
+Wol/members/Adduser.asp
+Wol/members/SignuptoLAN.asp
+Wol/members/signup.asp
+Wol/members/PasswordSent.asp
+Wol/members/Mail2e1.asp
+Wol/devel/Adduser.asp
+Wol/devel/SignuptoLAN.asp
+Wol/devel/signup.asp
+Wol/devel/PasswordSent.asp
+Wol/devel/Mail2e1.asp
+Wol/w3c/P3policy.xml
+Empired/Web.config
+Empired/Module1.vb
+Empired/Web (2).config
+Empired/Module1 (2).vb
+Empired/clients_rbottom.aspx (2).vb
+Empired/clients_rbottom.aspx.vb
+Home/Locator.aspx
+Home/Locator_old.aspx
+Home/includes/dataaccess.inc
+Domain Control/wwwroot/groups (2).asp
+Domain Control/wwwroot/ou (2).asp
+Domain Control/wwwroot/cpu (2).asp
+Domain Control/wwwroot/dynreportER.asp
+Domain Control/wwwroot/main.asp
+Domain Control/wwwroot/getinfo (2).asp
+Domain Control/wwwroot/getinfo.asp
+Domain Control/wwwroot/groups.asp
+Domain Control/wwwroot/cpu.asp
+Domain Control/wwwroot/users.asp
+Domain Control/wwwroot/main (2).asp
+Domain Control/wwwroot/hostinfo.asp
+Domain Control/wwwroot/hostinfo (2).asp
+Domain Control/wwwroot/ou.asp
+Domain Control/wwwroot/users (2).asp
+Domain Control/wwwroot/computers (2).asp
+Domain Control/wwwroot/dynreportER (2).asp
+Domain Control/wwwroot/computers.asp
+Pwgen/Web.config
+Departmental Intranets/Production/ITSupportDocuments/XML/Hardware.xml
+Departmental Intranets/Production/IT Intranet/HelpDeskServices.asp
+Departmental Intranets/Production/IT Intranet/UpdateDetails.asp
+Departmental Intranets/Production/IT Intranet/index.asp
+Departmental Intranets/Production/IT Intranet/ProcurementForm.asp
+Departmental Intranets/Production/IT Intranet/BACKUPUpdateDetails.asp
+Departmental Intranets/Production/IT Intranet/Global.asa
+Departmental Intranets/Production/IT Intranet/ProcurementForm-new.asp
+Departmental Intranets/Production/IT Intranet/Old/UpdateDetails.asp
+Departmental Intranets/Production/IT Intranet/Old/index.asp
+Departmental Intranets/Production/IT Intranet/Old/ITWorkRequest.asp
+Departmental Intranets/Production/IT Intranet/Old/Global2.asa
+Departmental Intranets/Production/HRIntranet/Global.asa

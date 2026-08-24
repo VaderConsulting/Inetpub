@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<!--#include file="styles.inc"-->
+<head>
+	<title>Main Switchboard</title>
+</head>
+
+<body>
+
+<%
+    response.expires = -1
+    Dim SQL
+    Dim DSN
+    Dim adoRS
+    Dim adoConn
+    Dim SQLServer
+    Dim Username
+    Dim Password
+    Dim i
+    Dim Records
+    Dim NoOfColumns
+    Dim ColumnWidth
+    Dim List
+    Dim Listname
+    Dim Action
+    Dim adOpenStatic, adLockOptimistic, adCmdText
+    
+    ' Cursor types
+    adOpenForwardOnly = 0
+    adOpenKeyset = 1
+    adOpenDynamic = 2
+    adOpenStatic = 3
+    
+    ' Lock types
+    adLockReadOnly = 1
+    adLockPessimistic = 2
+    adLockOptimistic = 3
+    adLockBatchOptimistic = 4
+    
+    'Cursor Locations
+    adUseServer = 2
+    adUseClient = 3
+    
+    adCmdUnknown = 0
+	adCmdText = 1
+	adCmdTable = 2
+
+    
+    List = Request.QueryString("list")
+%>
+
+<script language='vbscript'>
+
+Sub DoClear
+    parent.frames.item(2).window.location.href="main.asp?list=<%=list%>"
+End Sub
+
+</script>
+<%
+    Select Case List
+        Case "computersearch"
+            Listname = "Computers"
+            Action = "computers.asp"
+        Case "users"
+            Listname = "Users"
+            Action = "users.asp"
+        Case "groups"
+            Listname = "Groups"
+            Action = "groups.asp"
+        Case "ous"
+            Listname = "OUs"
+            Action = "ou.asp"
+        Case Else
+            Listname = "Unknown List type"
+            Action = "blank.htm"
+    End Select
+    
+    NoOfColumns = 5
+    ColumnWidth = 100
+    
+    Set adoConn = Server.CreateObject("ADODB.Connection")
+    Set adoRS = Server.CreateObject("ADODB.Recordset")
+    
+    SQLServer = "(Local)"
+    Username = "REDACTED"
+    Password = ""
+    
+    DSN = "Provider=SQLOLEDB.1;User ID="REDACTED";Initial Catalog=Domain Control;Data Source=" & SQLServer
+    
+    adoConn.Open DSN
+    SQL = "SELECT DISTINCT DomainName FROM tblHosts ORDER BY DomainName"
+    adoRS.CursorLocation = adUseClient ' Required so as to get Recordcount information
+    adoRS.Open SQL, adoConn, adOpenDynamic, adLockOptimistic, adCmdText
+    Records = adoRS.RecordCount
+    'Records = 1
+%>
+    <div align='center'>
+    <form action='<%=Action%>' method='get' name='frmDomain' id='frmDomain' target='_self'>
+<%
+    Select Case Records
+        Case 0
+            Response.Write "<div align='center'>" & vbcrlf
+            Response.Write "<h2>There are no Domains to Control.  Please Run Discovery.</h2>" & vbcrlf
+            Response.Write "</div>" & vbcrlf
+        Case 1
+            Response.Write "<div align='center'>" & vbcrlf
+            Response.Write "<h2>There is only one Domain listed.  Redirecting now...</h2>" & vbcrlf
+            Response.Write "</div>" & vbcrlf
+%>
+            <script language='vbscript'>
+                parent.frames.item(2).window.location.href="<%=action%>?Domainname=<%=adoRS("DomainName")%>"
+            </script>
+<%
+        Case Else
+%>
+            <div align = 'center'>
+                <h2>Select a Domain to view</h2>
+            </div>
+            <select name='Domainname' id='Domainname' size='10'>
+<%
+            Do Until adoRS.EOF
+                Response.Write "                <option value= '" & adoRS("DomainName") & "'>" & adoRS("DomainName") & "</option>" & vbcrlf
+                adoRS.MoveNext
+            Loop
+%>
+            </select>
+            <br>
+            <br>
+            <table border='0'>
+                <tr>
+                    <td align='center'>
+                        <input type='button' name='Clear' id='Clear' value='Clear' width='20' height='12' onClick='DoClear'>
+                        &nbsp;
+                        <input type='submit' value='Next' width='20' height='12'>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan='2' class='SmallBlackFont'>Hint:  Not selecting a Domain will show <%=Listname%> from all Domains.</td>
+                </tr>
+            </table>
+<%
+    End Select
+%>
+    
+    </form>
+    </div>
+<%
+    adoRS.Close
+    adoConn.Close
+%>
+</body>
+</html>
+<%
+    Set adoRS = Nothing
+    Set adoConn = Nothing
+%>
+

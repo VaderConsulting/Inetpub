@@ -1,0 +1,1037 @@
+<%
+option explicit
+'* serverStats v1.5
+'* The script accepts the name of a server (through a querystring item called server) and returns
+'* information gathered by Windows Management Instrumentation v1.5. The address would look like:
+'* http://[IIS server]/server.asp?server=[server being queried]
+'* e.g. http://Limbo/server.asp?server=behemoth
+'*
+'* --------------------
+'*
+'* Requirements:
+'* -WMI v1.5 on all machines being queried and the IIS server hosting the page
+'* -IIS server must be Win2k server or professional running IIS 5.0
+'* -A domain account that is part of the administrators group on each machine being queried
+'*          (or part of the domain admins group)
+'* -This user account is passed on line 97 of this script (change the bracketed values)
+'*
+
+    dim titleTag
+    dim objLocator
+    dim objService
+    dim strServer
+    dim i
+    dim strOS
+    dim itemCount
+    dim BeginRow: BeginRow = 1
+    dim EndRow: EndRow = 2
+    dim scriptPath: scriptPath = Request.ServerVariables("path_info")
+    Const BEGIN_TABLE =     "     <TABLE width=550 BORDER=0 CELLSPACING=1 CELLPADDING=2>"
+    Const END_TABLE =          "     </TABLE>"
+     
+    Dim SQL
+    Dim DSN
+    Dim adoRS
+    Dim adoConn
+    Dim SQLServer
+    Dim Domainname
+    Dim Username
+    Dim Password
+    
+    Set adoConn = Server.CreateObject("ADODB.Connection")
+    Set adoRS = Server.CreateObject("ADODB.Recordset")
+     
+          strServer = Request.QueryString("hostname")
+
+    SQLServer = "(Local)"
+    Username = "REDACTED"
+    
+    DSN = "Provider=SQLOLEDB.1;User ID="REDACTED";Initial Catalog=Domain Control;Data Source=" & SQLServer
+    
+    adoConn.Open DSN
+          
+          '
+          ' Check to see if the machine being queried is the machine hosting the script
+          ' If it is, don't supply the user name or password
+          '
+          if strServer = "" then
+               strServer = Request.ServerVariables("hostname")
+          end if
+          
+          SQL = "SELECT tblHosts.Hostname, tblConnections.Domainname, tblConnections.Username, tblConnections.Password FROM tblHosts LEFT JOIN tblConnections ON tblHosts.ConnectionID = tblConnections.ID WHERE Hostname = '" & strServer & "'"
+          adoRS.Open SQL, adoConn
+          If Not adoRS.EOF Then
+              Domainname = adoRS("Domainname")
+              Username = adoRS("Username")
+              Password =REDACTED"Password")
+          End If
+          adoRS.Close
+          '
+          ' Begin page
+          '
+          Response.Write _
+               "<HTML>" & vbcrlf & _
+               "<HEAD>" & vbcrlf & _
+               "<TITLE>" & strServer & " Server Statistics</TITLE>" & vbcrlf & _
+               "<style type=""text/css"">" & vbcrlf
+
+          '
+          ' The style sheets will be different depending on whether the user is viewing with Netscape or IE
+          '
+          if instr(1,Request.ServerVariables("http_user_agent"),"MSIE") then
+               Response.Write _
+                    "<!--" & vbcrlf & _
+                    ".head {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; font-weight: bold; color:'#ffffff'}" & vbcrlf & _
+                    ".category {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9px; font-weight: bold;}" & vbcrlf & _
+                    ".result {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9px;}" & vbcrlf & _
+                    "a {color: '#000066'; text-decoration:none;}" & vbcrlf & _
+                    "a:hover {text-decoration:underline}" & vbcrlf & _
+                    "-->" & vbcrlf
+          else
+               Response.Write _
+                    "<!--" & vbcrlf & _
+                    ".head {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; font-weight: bold color:#ffffff}" & vbcrlf & _
+                    ".category {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; font-weight: bold;}" & vbcrlf & _
+                    ".result {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px;}" & vbcrlf & _
+                    "-->" & vbcrlf
+          end if
+
+          Response.Write _
+               "</style>" & vbcrlf & _
+               "</HEAD>" & vbcrlf & _
+               "<body bgcolor=""#ffffff"">" & vbcrlf
+          '
+          ' Create the WMI locator object and manually capture the error if there is a problem
+          '
+          on error resume next
+          Set objLocator = server.CreateObject("WbemScripting.SWbemLocator")
+          if err then
+               Response.Write _
+                    "          <tr>" & vbcrlf &_
+                    "               <td class=result>There was an error while creating the locator object<br>" & vbcrlf &_
+                    err.number & " - " & err.description & vbcrlf &_
+                    "               </td>" & vbcrlf &_
+                    "          </tr>" & vbcrlf
+          else
+
+               '
+               ' Instantiate the service object. If the machine being queried is a remote machine,
+               ' user credentials must be passed. If the server being queried is the same as the server
+               ' hosting the page, no user info is passed
+               '
+               if lcase(strServer) = lcase(Request.ServerVariables("hostname")) then
+                    Set objService = objLocator.ConnectServer(strServer,"root\cimv2") '  MOD <-----------
+               else
+                    'Set objService = objLocator.ConnectServer(strServer,"root\cimv2","MOJ_Master\robinsod","password")
+                    Set objService = objLocator.ConnectServer(strServer,"root\cimv2",domainname & "\" & username , password) '  MOD <-----------
+               end if
+
+               '
+               ' Print error info if there was a problem instantiating the service object
+               '
+               if err then
+                    if err = -2147023174 then
+                         Response.Write _
+                              "          <tr>" & vbcrlf &_
+                              "               <td class=result>There was an error while connecting to " & request("hostname") & "<br>" & vbcrlf &_
+                              err.number & " - " & err.description & "<br>" & vbcrlf &_
+                              "               This error normally indicates that the server is either unavailable or does not have Windows Management Instrumentation installed.<br>" & vbCrLf & _
+                              " WMI 1.5 can be downloaded from Microsoft's web site at:<br>" & vbCrLf & _
+                              " <a href=http://msdn.microsoft.com/downloads/sdks/wmi/eula.asp target=_>msdn.microsoft.com</a>" & vbCrLf & _
+                              "               </td>" & vbcrlf &_
+                              "          </tr>" & vbcrlf
+                    else
+                         Response.Write _
+                              "          <tr>" & vbcrlf &_
+                              "               <td class=result>There was an error while connecting to " & request("hostname") & "<br>" & vbcrlf &_
+                              err.number & " - " & err.description & "<br>" & vbcrlf &_
+                              "               Make sure the user account being passed to the server is a member of that server's administrators group (or Domain Admins group)" & vbcrlf & _
+                              "               </td>" & vbcrlf &_
+                              "          </tr>" & vbcrlf
+                    end if
+               else
+
+                    '
+                    ' If there were no errors, call the fServerStats function to generate the stats page
+                    '
+                    if isempty(Request.QueryString("procHandle")) then
+                         call fServerStats()
+                         if err then
+                              Response.Write _
+                                   "          <tr>" & vbcrlf &_
+                                   "               <td class=result>There was an error while processing the page<br>" & vbcrlf &_
+                                   err.number & " - " & err.description & vbcrlf &_
+                                   "               </td>" & vbcrlf &_
+                                   "          </tr>" & vbcrlf
+                         end if
+                    else
+                         call getProcessInfo(Request.QueryString("procHandle"))
+                    end if
+                    set objLocator = nothing
+                    set objService = nothing
+               end if
+          end if
+
+          '
+          ' End page
+          '
+          Response.Write _
+               "</BODY>" & vbcrlf & _
+               "</HTML>" & vbcrlf
+          Set adors = nothing
+          Set adoConn=nothing
+
+'_________________________________________________________________________
+'
+'* *'
+'* Subs and Functions *'
+'* *'
+'_________________________________________________________________________
+sub fServerStats()
+     dim objInstance
+     dim item
+     dim aCounter
+     dim query
+     dim strDiskDescription
+     dim strOs
+     dim objPartitionSet
+     dim objPartition
+     dim objDriveSet
+     dim objDrive
+
+        '
+        ' Begin the table and write the General Info header
+        '
+        response.Write BEGIN_TABLE & vbcrlf
+        fWriteHeading "General " & strServer & " Information - Taken at " & Date & " " & time()
+
+        '
+        ' Define the WMI query
+        '
+        query = "select caption, domain, domainrole, systemtype,manufacturer, " _
+                    & "model, numberofprocessors, totalphysicalmemory " _
+                    & "from win32_computersystem"
+
+        '
+        ' Execute the query and create the objInstance object
+        '
+        Set objInstance = objService.ExecQuery(query)
+
+        '
+        ' Loop through the objects and write the information to the page
+        '
+        For Each item In objInstance
+            fWriteData "Name", item.Caption, BeginRow
+            fWriteData "Domain", item.Domain, empty
+            fWriteData "Role", fDomainRole(item.domainrole), EndRow
+            fWriteData "Type", item.systemtype, BeginRow
+            fWriteData "Manufacturer", checkValue(item.manufacturer, empty, empty), empty
+            fWriteData "Model", checkValue(item.model, empty, empty), EndRow
+            fWriteData "Processors", item.numberofprocessors, BeginRow
+            fWriteData "Memory", fFormatNum(item.totalphysicalmemory,True), empty
+        Next
+        Set objInstance = Nothing
+        query = "select freephysicalmemory,totalvirtualmemorysize,freevirtualmemory,FreeSpaceInPagingFiles, " _
+                    & "Caption,Version,currenttimezone,csdversion,oslanguage,lastbootuptime " _
+                    & "from win32_operatingsystem"
+        Set objInstance = objService.ExecQuery(query)
+        For Each item In objInstance
+            If InStr(1, item.Caption, "2000") Or InStr(1, item.Caption, "XP") Then
+                strOS = "2000" ' AND XP
+            Else
+                strOS = "WinNT9x"
+            End If
+            fWriteData "Free Mem", fFormatNum(1000 * item.freephysicalmemory, True), EndRow
+            fWriteData "Virtual Mem", fFormatNum(1000 * item.freephysicalmemory, True), BeginRow
+            fWriteData "Free Virt Mem", fFormatNum(1000 * item.freevirtualmemory, True), empty
+            fWriteData "Free Page Space", fFormatNum(1000 * item.FreeSpaceInPagingFiles, True), EndRow
+            fWriteData "OS", Replace(item.Caption, "Microsoft Windows", ""), BeginRow
+            fWriteData "Version", item.Version, empty
+            fWriteData "Time Zone", "GMT" & (item.currenttimezone \ 60), EndRow
+            fWriteData "SP", item.csdversion, BeginRow
+            fWriteData "OS Lang", fLangVers(Hex(item.oslanguage)), empty
+            fWriteData "Up Since", fDateDisplay(item.lastbootuptime), EndRow
+        Next
+        Set objInstance = Nothing
+
+        '
+        ' End the general information table and flush the output to the browser
+        '
+        spacer (10)
+        response.Write END_TABLE & vbcrlf
+        response.Flush
+
+        '
+        ' Begin the Processors table and write the heading info
+        '
+        response.Write BEGIN_TABLE & vbcrlf
+        fWriteHeading "Processor(s)"
+
+        '
+        ' Define the WMI query
+        '
+        query = "select deviceID, name, description, currentclockspeed, l2cachesize, l2cachespeed, " _
+                    & "extClock, upgrademethod, loadPercentage " _
+                    & "from win32_processor"
+
+        '
+        ' Execute the query and create the objInstance object
+        '
+        Set objInstance = objService.ExecQuery(query)
+
+        '
+        ' Loop through the objects and write the information to the page
+        '
+        For Each item In objInstance
+            fWriteData "Instance", item.deviceID, BeginRow
+            fWriteData "Family", item.Name, empty
+            fWriteData "Type", item.Description, EndRow
+            fWriteData "Speed", item.currentclockspeed & " Mhz", BeginRow
+            fWriteData "Cache&nbsp;Size", checkValue(item.l2cachesize, empty, " Kb"), empty
+            fWriteData "Cache&nbsp;Speed", checkValue(item.l2cachespeed, empty, " Mhz"), EndRow
+            fWriteData "External&nbsp;Clock", checkValue(item.extClock, empty, " Mhz"), BeginRow
+            fWriteData "Interface", fProcUpgrademethod(item.upgrademethod), empty
+            fWriteData "CPU&nbsp;Load", checkValue(item.loadpercentage, empty, "%"), EndRow
+        Next
+        Set objInstance = Nothing
+
+        '
+        ' End the Processors information table and flush the output to the browser
+        '
+        spacer (10)
+        response.Write END_TABLE & vbcrlf
+        response.Flush
+
+        '
+        ' Begin the Disks table
+        '
+        response.Write BEGIN_TABLE & vbcrlf
+
+        '
+        ' Define the WMI query
+        '
+        query = "select manufacturer, description, caption, interfacetype, partitions, size, scsibus, scsitargetid, status " _
+                    & "from win32_diskdrive"
+
+          '
+          ' Execute the query and create the objInstance object
+          '
+          Set objInstance = objService.ExecQuery(query)
+        For Each item In objInstance
+            If strOS = "2000" Then
+                strDiskDescription = item.Caption
+            Else
+                strDiskDescription = item.manufacturer & " " & item.Description
+            End If
+
+               '
+               ' Write the header information for each physical disk instance and then
+               ' write properties for physical disk
+               '
+            fWriteHeading (Replace(item.deviceID, "\\.\", "") & " - " & strDiskDescription)
+            fWriteData "Status", item.Status, BeginRow
+            fWriteData "Partitions", checkValue(item.partitions, empty, empty), empty
+            fWriteData "Type", item.interfacetype, EndRow
+            fWriteData "Size", fFormatNum(item.Size, false), BeginRow
+            fWriteData "SCSI Bus#", item.scsibus, empty
+            fWriteData "SCSI ID", item.scsitargetid, EndRow
+
+               '
+               ' Get all of the partitions associated with the particular physicaldisk
+               '
+            Set objPartitionSet = item.Associators_("Win32_DiskDriveToDiskPartition", "Win32_DiskPartition")
+
+            For Each objPartition In objPartitionSet
+
+                     '
+                    ' Get all of the logical disks associated with the particular partition
+                    '
+                Set objDriveSet = objPartition.Associators_("Win32_LogicalDiskToPartition", "Win32_LogicalDisk")
+                For Each objDrive In objDriveSet
+                    If objPartition.bootpartition Then
+                        fWriteData "Drive", objDrive.Caption & " - Boot Partition", BeginRow
+                    Else
+                        fWriteData "Drive", objDrive.Caption, BeginRow
+                    End If
+                    fWriteData "Label", objDrive.VolumeName, empty
+                    fWriteData "File Sys", objDrive.FileSystem, EndRow
+                    fWriteData "Size", fFormatNum(objDrive.Size, false), BeginRow
+                    fWriteData "Free", fFormatNum(objDrive.FreeSpace, false), empty
+                    fWriteData "S/N", checkValue(objDrive.VolumeSerialNumber, empty, empty), EndRow
+                Next
+            Next
+            spacer (10)
+        Next
+
+          '
+          ' Clean up the objects used within the physical disk table
+          '
+        Set objDriveSet = Nothing
+        Set objPartitionSet = Nothing
+        Set objInstance = Nothing
+
+        '
+        ' End the disk information table and flush the output to the browser
+        '
+        response.Write END_TABLE & vbcrlf
+        response.Flush
+
+        '
+        ' Begin the Network Adapters table and print the table heading
+        '
+        response.Write BEGIN_TABLE & vbcrlf
+        fWriteHeading ("Network Adapter(s)")
+
+        '
+        ' define the WMI query
+        '
+        query = "select Description, ipaddress, macaddress, dhcpenabled, dhcpleaseobtained, " _
+                    & "dhcpleaseexpires, dnshostname, dnsdomain, ipsubnet, defaultipgateway, " _
+                    & "dhcpserver, winsprimaryserver, winssecondaryserver, DNSServerSearchOrder " _
+                    & "from win32_networkadapterconfiguration"
+
+          '
+          ' Execute the query and create the objInstance object
+          '
+        Set objInstance = objService.ExecQuery(query)
+        For Each item In objInstance
+            fWriteData "Name", checkValue(item.Description, empty, empty), BeginRow
+            fWriteData "IP Address", buildItemString(item.ipaddress), empty
+            fWriteData "MAC", checkValue(item.macaddress, empty, empty), EndRow
+            fWriteData "Uses DHCP", checkValue(item.dhcpenabled, empty, empty), BeginRow
+            fWriteData "Lease Obtained", fDateDisplay(item.dhcpleaseobtained), empty
+            fWriteData "Expiration", fDateDisplay(item.dhcpleaseexpires), EndRow
+            fWriteData "FQDN", checkValue(item.dnshostname, empty, empty) & "." & checkValue(item.dnsdomain, empty, empty), BeginRow
+            fWriteData "Subnet", buildItemString(item.ipsubnet), empty
+            fWriteData "Gateways", buildItemString(item.defaultipgateway), EndRow
+            fWriteData "DHCP Srvs", buildItemString(item.dhcpserver), BeginRow
+            fWriteData "Wins Srvs", buildItemString(Array(item.winsprimaryserver, item.winssecondaryserver)), empty
+            fWriteData "DNS Srvs", buildItemString(item.DNSServerSearchOrder), EndRow
+        Next
+        Set objInstance = Nothing
+
+        '
+        ' End the Network Adapters information table and flush the output to the browser
+        '
+        spacer (10)
+        response.Write END_TABLE & vbcrlf
+        response.Flush
+
+        '
+        ' Begin the Processes table
+        ' The processes and services sections use arrays passed to functions to generate the tables
+        ' This is done for future purposes (starting and stopping services, killing processes, etc.)
+        '
+        response.Write BEGIN_TABLE & vbcrlf
+
+          '
+          ' Define the WMI query
+          '
+        query = "select caption, processid, workingsetsize, priority, threadcount, creationdate, name " _
+                    & "from win32_process"
+
+          '
+          ' Execute the query and create the objInstance object
+          '
+        Set objInstance = objService.ExecQuery(query)
+
+          '
+          ' Get the item count within ojbInstance and redimension the array
+          '
+        itemCount = objInstance.Count - 1
+        If itemCount > 1 Then
+            ReDim arrProcesses(6, CInt(itemCount))
+        Else
+            ReDim arrProcesses(6, 1)
+        End If
+
+        '
+        ' Populate the array
+        '
+        For Each item In objInstance
+            arrProcesses(0, aCounter) = item.Caption
+            arrProcesses(1, aCounter) = fFormatNum(item.workingSetSize, false)
+            arrProcesses(2, aCounter) = item.processID
+            arrProcesses(3, aCounter) = checkValue(item.Priority, empty, empty)
+            arrProcesses(4, aCounter) = checkValue(item.threadCount, empty, empty)
+            arrProcesses(5, aCounter) = checkValue(fDateDisplay(item.creationDate), empty, empty)
+            aCounter = aCounter + 1
+        Next
+        Set objInstance = Nothing
+
+          '
+          ' Write the processes heading and the column headings
+          '
+        fWriteHeading ("Processes - " & ubound(arrProcesses, 2) + 1)
+        response.Write _
+            "       <tr align=center bgcolor=#b6b6b6>" & vbCrLf & _
+            "           <td class=category>Name</td>" & vbCrLf & _
+            "           <td class=category>Memory</td>" & vbCrLf & _
+            "           <td class=category>PID</td>" & vbCrLf & _
+            "           <td class=category>Priority</td>" & vbCrLf & _
+            "           <td class=category>Threads</td>" & vbCrLf & _
+            "           <td class=category>Started</td>" & vbCrLf & _
+            "       </tr>" & vbCrLf
+
+        '
+        ' Pass the arrProcesses array to the fWriteTableProcesses function
+        '
+        fWriteTableProcesses arrProcesses
+
+        '
+        ' End the Processes information table and flush the output to the browser
+        '
+        spacer (10)
+        response.Write END_TABLE & vbcrlf
+        response.Flush
+
+        '
+        ' Begin the services table
+        '
+        response.Write BEGIN_TABLE & vbcrlf
+
+          '
+          ' Define the WMI query
+          '
+        query = "select displayname, state, startmode, servicetype, status, startname, acceptpause, acceptstop, name " _
+                    & "from win32_service"
+
+          '
+          ' Execute the query and create the objInstance object
+          '
+        Set objInstance = objService.ExecQuery(query)
+
+          '
+          ' Get the item count within ojbInstance and redimension the array
+          '
+        itemCount = objInstance.Count - 1
+        If itemCount > 1 Then
+            ReDim arrServices(8, CInt(itemCount))
+        Else
+            ReDim arrServices(8, 1)
+        End If
+        aCounter = 0
+
+        '
+        ' Populate the array
+        '
+        For Each item In objInstance
+            arrServices(0, aCounter) = item.DisplayName
+            arrServices(1, aCounter) = item.State
+            arrServices(2, aCounter) = item.StartMode
+            arrServices(3, aCounter) = item.serviceType
+            arrServices(4, aCounter) = item.Status
+            arrServices(5, aCounter) = item.startname
+            arrServices(6, aCounter) = item.acceptPause
+            arrServices(7, aCounter) = item.acceptStop
+            arrServices(8, aCounter) = item.Name
+            aCounter = aCounter + 1
+        Next
+        Set objInstance = Nothing
+
+          '
+          ' Write the Services heading and the column headings
+          '
+        fWriteHeading ("Services - " & ubound(arrServices, 2) + 1)
+        response.Write _
+            "       <tr align=center bgcolor=#b6b6b6>" & vbCrLf & _
+            "           <td class=category nowrap>Name</td>" & vbCrLf & _
+            "           <td class=category nowrap>State</td>" & vbCrLf & _
+            "           <td class=category nowrap>Start Mode</td>" & vbCrLf & _
+            "           <td class=category nowrap>Type</td>" & vbCrLf & _
+            "           <td class=category nowrap>Status</td>" & vbCrLf & _
+            "           <td class=category nowrap>Start Name</td>" & vbCrLf & _
+            "       </tr>" & vbCrLf
+
+        '
+        ' Pass the arrServices array to the fWriteTableServices function
+        '
+        fWriteTableServices arrServices
+
+        '
+        ' End the table
+        '
+        response.Write END_TABLE & vbcrlf
+
+End Sub
+'_________________________________________________________________________
+Private Sub getProcessInfo(procHandle)
+
+    Dim objProc
+    Dim sWqlString
+    Dim item
+    Dim astrProps(2, 21)
+    Dim i
+    Dim sSectionHead
+    Dim sProcessOwner
+    Dim sProcessOwnerDomain
+    Dim sParentProcess
+    Dim lngResults
+        sWqlString = "select caption, creationDate, executablePath, threadCount, " _
+                            & "handleCount, MaximumWorkingSetsize, MinimumWorkingSetSize, " _
+                            & "pageFaults, pageFileUsage, parentProcessID, PeakPageFileUsage, PeakVirtualSize, " _
+                            & "PeakWorkingSetSize, Priority, PrivatePageCount, QuotaNonPagedPoolUsage, QuotaPeakNonPagedPoolUsage, " _
+                            & "quotaPagedPoolUsage, quotaPeakPagedPoolUsage, VirtualSize, WorkingSetSize " _
+                            & "from win32_process where handle = '" & procHandle & "'"
+        On Error Resume Next
+            '
+            ' Handle errors manually
+            '
+            Set objProc = objService.ExecQuery(sWqlString).item("win32_process.handle='" & procHandle & "'")
+            Response.Write _
+                    " <TABLE BORDER=0 CELLSPACING=0 CELLPADDING=1 width=""100%"">" & vbCrLf
+            If Err Then
+                response.Write _
+                    "       <tr>" & vbCrLf & _
+                    "           <td bgcolor=#99ccff class=head colspan=2 align=middle height=30>" & vbCrLf & _
+                    "               An error occured while getting process details<br>" & vbCrLf & _
+                    "               " & Err.Number & " - " & Err.Description & vbCrLf & _
+                    "           </td>" & vbCrLf & _
+                    "       </tr>" & vbCrLf
+                Exit Sub
+            End If
+            lngResults = objProc.getOwner(sProcessOwner, sProcessOwnerDomain)
+            If lngResults Then
+                sProcessOwner = "N/A"
+            Else
+                sProcessOwner = sProcessOwnerDomain & "\" & sProcessOwner
+            End If
+            sParentProcess = objService.Get("win32_process.handle='" & objProc.parentProcessID & "'").Caption _
+                                    & " - " & objProc.parentProcessID
+            If Err Then
+                sParentProcess = "N/A"
+            Else
+                    sParentProcess = "<a href=" & scriptPath & "?procHandle=" _
+                     & Mid(sParentProcess, InStrRev(sParentProcess, "-") + 2) _
+                     & "&server=" & strServer & ">" & sParentProcess & "</a>"
+            End If
+            '
+            ' End error handler
+            '
+        astrProps(0, 0) = "Process Name"
+        astrProps(1, 0) = objProc.Caption
+        astrProps(2, 0) = "general"
+        astrProps(0, 1) = "Creation Date"
+        astrProps(1, 1) = checkValue(fDateDisplay(objProc.creationDate), empty, empty)
+        astrProps(2, 1) = "general"
+        astrProps(0, 2) = "Executable Path"
+        astrProps(1, 2) = checkValue(objProc.executablePath, empty, empty)
+        astrProps(2, 2) = "general"
+        astrProps(0, 3) = "Thread Count"
+        astrProps(1, 3) = checkValue(objProc.threadCount, empty, empty)
+        astrProps(2, 3) = "general"
+        astrProps(0, 4) = "Handle/Process ID"
+        astrProps(1, 4) = objProc.Handle
+        astrProps(2, 4) = "general"
+        astrProps(0, 5) = "Handle Count"
+        astrProps(1, 5) = checkValue(FormatNumber(objProc.handleCount, 0, vbFalse, vbTrue, vbUseDefault), empty, empty)
+        astrProps(2, 5) = "general"
+        astrProps(0, 6) = "Parent Process"
+        astrProps(1, 6) = sParentProcess
+        astrProps(2, 6) = "general"
+        astrProps(0, 7) = "Priority"
+        astrProps(1, 7) = objProc.Priority
+        astrProps(2, 7) = "general"
+        astrProps(0, 8) = "Current Size"
+        astrProps(1, 8) = checkValue(FormatNumber(objProc.workingSetSize, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 8) = "Working Set"
+        astrProps(0, 9) = "Peak Size"
+        astrProps(1, 9) = checkValue(FormatNumber(objProc.peakWorkingSetSize, 0, vbFalse, vbTrue,vbUseDefault), empty, " bytes")
+        astrProps(2, 9) = "Working Set"
+        astrProps(0, 10) = "Maximum Size"
+        astrProps(1, 10) = checkValue(FormatNumber(objProc.maximumWorkingSetSize, 0, vbFalse, vbTrue,vbUseDefault), empty, " bytes")
+        astrProps(2, 10) = "Working Set"
+        astrProps(0, 11) = "Minimum Size"
+        astrProps(1, 11) = checkValue(FormatNumber(objProc.minimumWorkingSetSize, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 11) = "Working Set"
+        astrProps(0, 12) = "Page Faults"
+        astrProps(1, 12) = FormatNumber(objProc.pageFaults, 0, vbFalse, vbTrue, vbUseDefault)
+        astrProps(2, 12) = "Paging"
+        astrProps(0, 13) = "Page File Usage"
+        astrProps(1, 13) = checkValue(FormatNumber(objProc.pageFileUsage, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 13) = "Paging"
+        astrProps(0, 14) = "Peak Usage"
+        astrProps(1, 14) = checkValue(FormatNumber(objProc.peakPageFileUsage, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 14) = "Paging"
+        astrProps(0, 15) = "Private Page Count"
+        astrProps(1, 15) = checkValue(FormatNumber(objProc.privatePageCount, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 15) = "Paging"
+        astrProps(0, 16) = "Current Size"
+        astrProps(1, 16) = checkValue(FormatNumber(objProc.virtualSize, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 16) = "Virtual Address Space"
+        astrProps(0, 17) = "Peak Size"
+        astrProps(1, 17) = checkValue(FormatNumber(objProc.peakVirtualSize, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 17) = "Virtual Address Space"
+        astrProps(0, 18) = "Current Paged Pool Size"
+        astrProps(1, 18) = checkValue(FormatNumber(objProc.quotaPagedPoolUsage, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 18) = "Paged/Non-Paged Pool"
+        astrProps(0, 19) = "Peak Paged Pool Size"
+        astrProps(1, 19) = checkValue(FormatNumber(objProc.quotaPeakPagedPoolUsage, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 19) = "Paged/Non-Paged Pool"
+        astrProps(0, 20) = "Current Non-Paged Pool Size"
+        astrProps(1, 20) = checkValue(FormatNumber(objProc.quotaNonPagedPoolUsage, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 20) = "Paged/Non-Paged Pool"
+        astrProps(0, 21) = "Peak Non-Paged Pool Size"
+        astrProps(1, 21) = checkValue(FormatNumber(objProc.quotaPeakNonPagedPoolUsage, 0, vbFalse, vbTrue, vbUseDefault), empty, " bytes")
+        astrProps(2, 21) = "Paged/Non-Paged Pool"
+        Set objProc = Nothing
+        On Error GoTo 0
+        response.Write _
+            "       <tr>" & vbCrLf & _
+            "           <td bgcolor=#99ccff class=head colspan=2 align=middle height=30>" & vbCrLf & _
+            "               <font color=#000000>" & astrProps(1, 0) & " - <font color=#000000>" & strServer & " - <span class=result>" & Now() & "</span>" & vbCrLf & _
+            "           </td>" & vbCrLf & _
+            "       </tr>" & vbCrLf & _
+            "       <tr>" & vbCrLf & _
+            "           <td class=category nowrap align=right width=""50%"">" & vbCrLf & _
+            "               Security Account&nbsp;" & vbCrLf & _
+            "           </td>" & vbCrLf & _
+            "           <td class=result width=""50%"">" & vbCrLf & _
+            "               &nbsp;" & sProcessOwner & vbCrLf & _
+            "           </td>" & vbCrLf & _
+            "       </tr>" & vbCrLf
+            sSectionHead = astrProps(2, 0)
+        For i = 1 To UBound(astrProps, 2)
+            If sSectionHead <> astrProps(2, i) Then
+                sSectionHead = astrProps(2, i)
+                response.Write _
+                    "       <tr><td height=14></td></tr>" & vbCrLf & _
+                    "       <tr>" & vbCrLf & _
+                    "           <td colspan=2 align=middle class=result>" & vbCrLf & _
+                    "               <b><u>" & sSectionHead & "</u></b>" & vbCrLf & _
+                    "           </td>" & vbCrLf & _
+                    "       </tr>" & vbCrLf
+            End If
+            response.Write _
+                "       <tr>" & vbCrLf & _
+                "           <td class=category nowrap align=right width=""50%"">" & vbCrLf & _
+                "               " & astrProps(0, i) & "&nbsp;" & vbCrLf & _
+                "           </td>" & vbCrLf & _
+                "           <td class=result nowrap width=""50%"">" & vbCrLf & _
+                "               &nbsp;" & astrProps(1, i) & vbCrLf & _
+                "           </td>" & vbCrLf & _
+                "       </tr>" & vbCrLf
+        Next
+end sub
+'_________________________________________________________________________
+
+Private Sub fWriteData(sName, sValue, iRowType)
+
+     '
+     ' Writes the columns and rows within the different sections of the page. Accepts a name value pair
+     ' (sName and sValue) and then lets you determine if this is the end or beginning of a new row (iRowType)
+     ' The value passed for iRowType can be either the BeginRow (1) or EndRow (2) constants
+     '
+
+        If iRowType = BeginRow Then response.Write _
+            "       <tr>" & vbCrLf
+        response.Write _
+            "           <TD bgcolor=#cccccc align=right class=category height=12>" & sName & "</TD>" & vbCrLf & _
+            "           <TD bgcolor=#99ccff class=result height=12>" & sValue & "</TD>" & vbCrLf
+        If iRowType = EndRow Then response.Write _
+            "       </tr>" & vbCrLf
+
+End Sub
+'_________________________________________________________________________
+
+Private Sub fWriteHeading(sHeading)
+
+     '
+     ' Accepts a string and then writes the header of each section of the report
+     '
+
+        response.Write _
+            "       <tr>" & vbCrLf & _
+            "           <td colspan=6 bgcolor=#000000 class=head>" & sHeading & vbCrLf & _
+            "       </tr>" & vbCrLf
+
+End Sub
+'_________________________________________________________________________
+
+Private Sub spacer(iHeight)
+
+     '
+     ' Allows the insertion of a spacer within the table. Accepts the height of the spacer
+     '
+
+    response.Write _
+        "          <tr><td height=" & iHeight & "></td></tr>" & vbCrLf
+
+End Sub
+'_________________________________________________________________________
+
+Private Sub fWriteTableProcesses(varArray)
+
+     '
+     ' Takes an array and writes the processes section of the page
+     '
+        For i = 0 To UBound(varArray, 2)
+            response.Write _
+                "       <tr>" & vbCrLf & _
+                "           <TD bgcolor=#cccccc align=left class=result><a href=" & scriptPath & "?procHandle=" & varArray(2, i) _
+                & "&server=" & strServer & ">" & varArray(0, i) & "</a></TD>" & vbCrLf & _
+                "           <TD bgcolor=#99ccff align=center class=result>" & varArray(1, i) & "</TD>" & vbCrLf & _
+                "           <TD bgcolor=#cccccc align=center class=result>" & varArray(2, i) & "</TD>" & vbCrLf & _
+                "           <TD bgcolor=#99ccff align=center class=result>" & varArray(3, i) & "</TD>" & vbCrLf & _
+                "           <TD bgcolor=#cccccc align=center class=result>" & varArray(4, i) & "</TD>" & vbCrLf & _
+                "           <TD bgcolor=#99ccff align=center class=result>" & varArray(5, i) & "</TD>" & vbCrLf & _
+                "       </tr>" & vbCrLf
+        Next
+
+End Sub
+'_________________________________________________________________________
+
+Private Sub fWriteTableServices(varArray)
+
+     '
+     ' Takes an array and writes the services section of the page
+     '
+        For i = 0 To UBound(varArray, 2)
+            response.Write _
+                "       <tr>" & vbCrLf & _
+                "           <TD bgcolor=#cccccc align=left class=result>" & varArray(0, i) & "</td>" & vbCrLf & _
+                "           <TD bgcolor=#99ccff align=center class=result>" & varArray(1, i) & "</TD>" & vbCrLf & _
+                "           <TD bgcolor=#cccccc align=center class=result>" & varArray(2, i) & "</TD>" & vbCrLf & _
+                "           <TD bgcolor=#99ccff align=center class=result nowrap>" & varArray(3, i) & "</TD>" & vbCrLf & _
+                "           <TD bgcolor=#cccccc align=center class=result>" & varArray(4, i) & "</TD>" & vbCrLf & _
+                "           <TD bgcolor=#99ccff align=center class=result>" & varArray(5, i) & "</TD>" & vbCrLf & _
+                "       </tr>" & vbCrLf
+        Next
+
+End Sub
+'_________________________________________________________________________
+
+Private Function fFormatNum(num, DropDecimal)
+
+     '
+     ' Formats a number (num) as Kb, Mb, Gb or Tb and rounds it off if dropDecimal is set to true
+     ' or the two digits to the right of the decimal are 00
+     '
+
+        Dim bytes
+        Dim lngSize
+            If IsNumeric(num) Then
+                if Len(num) < 7 then
+                        lngSize = FormatNumber((num / 1024), 2, vbTrue, vbTrue, vbUseDefault)
+                        bytes = " Kb"
+                elseif Len(num) < 10 then
+                        lngSize = FormatNumber((num / 1024 ^ 2), 2, vbTrue, vbTrue, vbUseDefault)
+                        bytes = " Mb"
+                elseif Len(num) < 13 then
+                        lngSize = FormatNumber((num / 1024 ^ 3), 2, vbTrue, vbTrue, vbUseDefault)
+                        bytes = " Gb"
+                elseif len(num) >= 13 then
+                        lngSize = FormatNumber((num / 1024 ^ 4), 2, vbTrue, vbTrue, vbUseDefault)
+                        bytes = " Tb"
+                end if
+                If DropDecimal or right(lngSize, 2) = "00" Then
+                    fFormatNum = CStr(Round(lngSize, 0)) & bytes
+                Else
+                    fFormatNum = CStr(lngSize) & bytes
+                End If
+            Else
+                fFormatNum = num
+            End If
+
+End Function
+'_________________________________________________________________________
+
+function fDateDisplay(num)
+
+     '
+     ' Takes a datetime value from WMI (wbemCimtypeDatetime) and converts it to date and time format.
+     '
+
+     dim year
+     dim month
+     dim day
+     dim time
+        If IsNull(num) Then
+            fDateDisplay = "N/A"
+            Exit Function
+        End If
+          year = left(num,4)
+          month = mid(num,5,2)
+          day = mid(num,7,2)
+          time = mid(num,9,2) & ":" & mid(num,11,2) & ":" & mid(num,13,2)
+          fDateDisplay = dateserial(year,month,day) & " " & cdate(time)
+
+end function
+'_________________________________________________________________________
+
+function fDomainRole(value)
+
+     '
+     ' dictionary object that allows us to look up the domainRole of the machine we're querying
+     '
+
+     dim dictDomRole
+          set dictDomRole = server.CreateObject("scripting.dictionary")
+
+          dictDomRole.Add "0","Standalone Workstation"
+          dictDomRole.Add "1","Member Workstation"
+          dictDomRole.Add "2","Standalone Server"
+          dictDomRole.Add "3","Member Server"
+          dictDomRole.Add "4","Backup Domain Controller"
+          dictDomRole.Add "5","Primary Domain Controller"
+
+          fDomainRole = dictDomRole.Item(cstr(value))
+          set dictDomRole = nothing
+
+end function
+'_________________________________________________________________________
+
+function fProcFamily(value)
+
+     '
+     ' dictionary object that allows us to look up the processor type of the machine we're querying
+     '
+
+     dim dictProc
+          set dictProc = server.CreateObject("scripting.dictionary")
+
+          dictProc.Add "11","Pentium"
+          dictProc.add "12","Pentium Pro"
+          dictProc.Add "13","PII"
+          dictProc.Add "14","Pentium MMX"
+          dictProc.Add "15","Celeron"
+          dictProc.Add "16","PII Xeon"
+          dictProc.Add "17","PIII"
+          dictProc.Add "21","K6 Family"
+          dictProc.Add "22","K6-2"
+          dictProc.Add "23","K6-III"
+          dictProc.Add "24","Athlon"
+          dictProc.Add "25","DECAlpha"
+          dictProc.Add "38","PIII Xeon"
+          dictProc.Add "48","Sh-3"
+          dictProc.Add "49","Sh-4"
+
+          fProcFamily = dictProc.Item(cstr(value))
+          set dictProc = nothing
+
+end function
+'_________________________________________________________________________
+
+function fLangVers(value)
+
+     '
+     ' dictionary object that allows us to look up the OS Language of the machine we're querying
+     '
+
+     dim dictLang
+          set dictLang = server.CreateObject("scripting.dictionary")
+
+          dictLang.Add "409","English (US)"
+          dictLang.add "809","English (Britain)"
+          dictLang.Add "1009","English (Canada)I"
+          dictLang.Add "1409","English (New Zealand)"
+          dictLang.Add "0c09","English (Australian)"
+          dictLang.Add "1809","English (Ireland)"
+          dictLang.Add "1c09","English (South America)"
+          dictLang.Add "2009","English (Jamaica)"
+          dictLang.Add "2409","English (Caribbean)"
+          dictLang.Add "40c","French (Standard)"
+          dictLang.Add "80c","French (Belgian)"
+          dictLang.Add "100c","French (Switzerland)"
+          dictLang.Add "c0c","French (Canadian)"
+          dictLang.Add "140c","French (Luxembourg)"
+          dictLang.Add "407","German (Standard)"
+          dictLang.Add "807","German (Switzerland)"
+          dictLang.Add "c07","German (Austria)"
+          dictLang.Add "1007","German (Luxembourg)"
+          dictLang.Add "1407","German (Liechtenstein)"
+          dictLang.Add "411","Japanese"
+          dictLang.Add "80a","Spanish (Mexican)"
+          dictLang.Add "40a","Spanish (Traditinal Sort)"
+          dictLang.Add "c0a","Spanish (Modern Sort)"
+
+          fLangVers = dictLang.Item(lcase(cstr(value)))
+          set dictLang = nothing
+
+end function
+'_________________________________________________________________________
+
+function fProcUpgrademethod(value)
+
+     '
+     ' dictionary object that allows us to look up the processor interface type of the machine we're querying
+     '
+
+     dim dictInterface
+          set dictInterface = server.CreateObject("scripting.dictionary")
+
+          dictInterface.Add "1","Other"
+          dictInterface.Add "2","Unknown"
+          dictInterface.Add "3","Daughter Board"
+          dictInterface.Add "4","ZIF Socket"
+          dictInterface.Add "5","Replacement/Piggy Back"
+          dictInterface.Add "6","None"
+          dictInterface.Add "7","LIF Socket"
+          dictInterface.Add "8","Slot 1"
+          dictInterface.Add "9","Slot 2"
+          dictInterface.Add "10","370 Pin Socket"
+          dictInterface.Add "11","Slot A"
+          dictInterface.Add "12","Slot M"
+
+          fProcUpgrademethod = dictInterface.Item(cstr(value))
+          set dictInterface = nothing
+
+end function
+'_________________________________________________________________________
+
+Function buildItemString(aItems)
+
+     '
+     ' Accepts an array or string and returns an HTML string containing breaks <br> after
+     ' each string. Used where more than one value is returned from a WMI property
+     '
+
+    Dim objItem
+    Dim tempString
+    Dim i
+    Dim arraySize
+    dim blnFlag
+        if isnull(aItems) then
+               tempString = "N/A"
+        elseif IsArray(aItems) Then
+            For i = 0 To UBound(aItems)
+                    if aItems(i) <> "" or not isnull(aItems(i)) then
+                         blnFlag = true
+                    end if
+            Next
+            arraySize = UBound(aItems)
+            if blnFlag then
+                    For i = 0 To UBound(aItems)
+                     If arraySize <> i Then
+                     tempString = tempString & aItems(i) & "<br>"
+                     Else
+                     tempString = tempString & aItems(i)
+                     End If
+                    Next
+               else
+                    tempString = "N/A"
+               end if
+        Else
+            tempString = aItems
+        End If
+    If Right(Trim(LCase(tempString)), 4) = "<br>" Then
+        tempString = Left(Trim(tempString), Len(Trim(tempString)) - 4)
+    Else
+        tempString = Trim(tempString)
+    End If
+    buildItemString = tempString
+End Function
+'_________________________________________________________________________
+
+Function checkValue(varValue, prepender, appender)
+
+        If IsNull(varValue) Or varValue = "" Then
+            checkValue = "N/A"
+        Else
+            checkValue = cstr(prepender & varValue & appender)
+        End If
+
+End Function
+'end functions and subs
+
+%>

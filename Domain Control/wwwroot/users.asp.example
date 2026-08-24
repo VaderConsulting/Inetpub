@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<!--#include file="styles.inc"-->
+<head>
+	<title>Users</title>
+</head>
+
+<body>
+<div align = 'center'>
+<h2>Select a Domain to view</h2>
+</div>
+
+<script language='vbscript'>
+
+Sub DoClear
+    frmReload.submit
+End Sub
+
+</script>
+
+<%
+    response.expires = 30
+    Dim SQL
+    Dim DSN
+    Dim adoRS
+    Dim adoConn
+    Dim SQLServer
+    Dim Username
+    Dim Password
+    Dim i
+    Dim NoOfColumns
+    Dim ColumnWidth
+    
+    NoOfColumns = 5
+    ColumnWidth = 100
+    
+    Set adoConn = Server.CreateObject("ADODB.Connection")
+    Set adoRS = Server.CreateObject("ADODB.Recordset")
+    
+    SQLServer = "(Local)"
+    Username = "REDACTED"
+    Password = ""
+    
+    DSN = "Provider=SQLOLEDB.1;User ID="REDACTED";Initial Catalog=Domain Control;Data Source=" & SQLServer
+    
+    adoConn.Open DSN
+    SQL = "SELECT DISTINCT DomainName FROM tblHosts ORDER BY DomainName"
+    adoRS.Open SQL, adoConn
+
+%>
+    <div align='center'>
+    
+    <form action='computers.asp' method='get' name = 'frmReload' id='frmReload' target='_self'>
+    </form>
+    <form action='DC.asp' method='get' name='frmDomain' id='frmDomain' target='_self'>
+    <select name='Domainname' id='Domainname' size='10'>
+<%
+    Do Until adoRS.EOF
+        Response.Write "<option value= '" & adoRS("DomainName") & "'>" & adoRS("DomainName") & "</option>" & vbcrlf
+        adoRS.MoveNext
+    Loop
+%>
+    </select>
+    <br>
+    <br>
+    <table border='0'>
+        <tr>
+            <td align='center'>
+                <input type='button' name='Clear' id='Clear' value='Clear' width='20' height='12' onClick='DoClear'>
+                &nbsp;
+                <input type='submit' value='Next' width='20' height='12'>
+            </td>
+        </tr>
+        <tr>
+            <td colspan='2' class='SmallBlackFont'>Hint:  Not selecting a Domain will show Users from all Domains.</td>
+        </tr>
+    </table>
+    </form>
+    </div>
+<%
+    adoRS.Close
+    adoConn.Close
+%>
+</body>
+</html>
+<%
+    Set adoRS = Nothing
+    Set adoConn = Nothing
+%>
+

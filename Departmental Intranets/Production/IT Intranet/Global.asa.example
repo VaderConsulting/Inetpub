@@ -1,0 +1,99 @@
+<script language="vbscript" runat="server">
+
+sub Application_OnStart
+	
+	'define the root folder for the user-defined intranet documents
+	Application("Documents") = "ITSupportDocuments/"
+	
+	'define the email variables
+	Application("EmailFromAccount") = "redacted@example.com"
+	Application("EmailProcurementForm") = "redacted@example.com"
+	Application("EmailSMTPServer") = "MDCDCM01"
+	
+	Application("EmailITSupport") = "redacted@example.com"
+	Application("EmailWorkRequest") = "redacted@example.com;redacted@example.com"
+	Application("EmailApplicationPackageRequest") = "redacted@example.com"
+	Application("EmailProjectInitiation") = "redacted@example.com;redacted@example.com"
+	
+	'define the Active Directory account settings
+	Application("ADServiceAccount") = "EXAMPLE\svc-example"
+	Application("ADServicePassword") = "example-password"
+end sub
+
+sub Application_OnEnd
+  'add some code
+end sub
+
+sub Session_OnStart
+	
+	'grab the standard information about the user from LDAP and save it to session variables
+	GetLDAP
+end sub
+
+sub Session_OnEnd
+  'add some code
+end sub
+
+'this subroutine will retrieve the users information from LDAP and
+'save it into session variables.
+'
+'CREATED SESSION VARIABLES:
+'	SAMUserName	- the current user's logon account name
+'	LDAPUserName	- the LDAP identifier for the current user
+'	UsersName	- given name and surname of the current user
+'	EmailAddr	- current user's email address
+Sub GetLDAP()
+	
+	'define the local variables/constants
+	Dim ServiceAccount
+	ServiceAccount = Application("ADServiceAccount")
+	Dim ServicePassword
+	ServicePassword =REDACTED"ADServicePassword")
+	Const ADS_SECURE_AUTHENTICATION = 1
+	Const ADS_USE_ENCRYPTION = 2
+	Const ADS_PROPERTY_CLEAR = 1
+	
+	'grab the users logon information
+	Dim lstrDisplayUser
+	lstrDisplayUser = UCASE(Request.ServerVariables("LOGON_USER"))
+	lstrDisplayUser = Replace(lstrDisplayUser, "OXIANA\", "")
+	
+	'define the recordset objects
+	Dim adoConn
+	Dim adoCmd
+	Dim adoRS
+	
+	'create the connection object
+	Set adoConn = CreateObject("ADODB.Connection")
+	
+	'Attempt to locate the user account in AD
+	adoConn.Provider = "ADsDSOObject"
+	adoConn.Properties("User ID") = ServiceAccount
+	adoConn.Properties("Password") = ServicePassword
+	adoConn.Properties("ADSI Flag") = 1
+	adoConn.Properties("Encrypt Password") = True
+	adoConn.Open "ADSI"
+	Set adoCmd = CreateObject("ADODB.Command")
+	Set adoCmd.ActiveConnection = adoConn
+	adoCmd.CommandText = "<LDAP://DC=Oxiana,DC=com,DC=au>;(&(objectCategory=user)(sAMAccountName=" + lstrDisplayUser + "));ADsPath,displayName,CN,givenName,mail,sn,telephoneNumber,company,st,streetAddress,facsimileTelephoneNumber,description,postalcode,physicalDeliveryOfficeName,mobile,l,title,Department,countryCode;subtree"
+	On Error Resume Next
+	Set adoRS = adoCmd.Execute
+	
+	'store the ldap information in a session variable
+	Session("SAMUserName") = lstrDisplayUser 
+	Session("LDAPUserName") = CStr(adoRS("ADsPath"))
+	Session("UsersName") = CStr(adoRS("givenName")) + " " + CStr(adoRS("sn"))
+	Session("EmailAddr") = Cstr(adoRS("mail"))
+	On Error Goto 0
+
+	'close the recordset objects
+	if UCase(TypeName(adoRS)) <> "EMPTY" Then
+		adoRS.Close
+	End If
+	adoConn.Close
+	
+	'release the objects
+	Set adoRS = Nothing
+	Set adoConn = Nothing
+End Sub
+</script>

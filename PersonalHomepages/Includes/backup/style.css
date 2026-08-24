@@ -1,0 +1,38 @@
+.BodyText
+{
+    FONT-SIZE: 12px;
+    COLOR: black;
+    FONT-FAMILY: Arial
+}
+.WarningText
+{
+    FONT-WEIGHT: bolder;
+    FONT-SIZE: 12px;
+    COLOR: black;
+    FONT-FAMILY: Arial
+}
+.SectionHeaderText
+{
+    FONT-WEIGHT: bolder;
+    FONT-SIZE: 16px;
+    COLOR: black;
+    FONT-FAMILY: Arial
+}
+.ColumnHeaderText
+{
+    FONT-WEIGHT: bolder;
+    FONT-SIZE: 12px;
+    COLOR: black;
+    FONT-FAMILY: Arial
+}
+.SmallText
+{
+    FONT-SIZE: 10px;
+    COLOR: black;
+    FONT-FAMILY: Arial
+}
+.InvisibleSpan
+{
+    DISPLAY: none;
+    VISIBILITY: hidden
+}

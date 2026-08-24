@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<root>
+	<SITE name="Adelaide" street="Ground Floor, 170 Greenhill Road" city="Parkside" state="SA" postcode="5063" country="Australia" officephone="+61 8 8229 6600" officefax="+61 8 8229 6601" />
+	<SITE name="Adelaide Project Office" street="Level 4, 190 Flinders St" city="Adelaide" state="SA" postcode="5000" country="Australia" officephone="+61 8 8672 8810" officefax="+61 8 8672 8801" />
+	<SITE name="Brisbane" street="Level 1, 11 Hi Tech Court" city="Eight Mile Plains, Brisbane" state="QLD" postcode="4113" country="Australia" officephone="+61 7 3112 8200" officefax="+61 7 3841 1421" />
+	<SITE name="Cambodia" street="#42 Street 240 Daun Penh" city="Phnom Penh" state="" postcode="" country="Cambodia" officephone="+855 12 221085" officefax="" />
+	<SITE name="China" street="Room 806, 48 Dongfeng East Rd" city="Kunming" state="Yunnan P.R" postcode="" country="China" officephone="+86 871 802 4000" officefax="+86 871 802 3999" />
+	<SITE name="Golden Grove" street="PMB 7" city="Geraldton" state="Western Australia" postcode="6530" country="Australia" officephone="+61 8 9956 4222" officefax="+61 8 9961 3860" />
+	<SITE name="Jakarta" street="Level 12, Suite 1201, Wisma Pondok Indah 2, Jl.Sultan Iskandar Muda Kav. V-TA" city="Pondok Indah" state="Jakarta" postcode="12310" country="Indonesia" officephone="+62 217 883 4498" officefax="+62 21 759 22 818" />
+	<SITE name="Martabe" street="Jl. Merdeka Barat Desa Aek Pining km 3.5" city="Batangtoru Kab. Tapsel" state="Sumatra" postcode="22738" country="Indonesia" officephone="+62 634 370 330" officefax="+62 634 370 333" />
+	<SITE name="Melbourne" street="Level 9, 31 Queen Street" city="Melbourne" state="VIC" postcode="3000" country="Australia" officephone="+61 3 8623 2200" officefax="+61 3 8623 2233" />
+	<SITE name="Perth" street="Level 2, 16 Ord Street" city="West Perth" state="WA" postcode="6005" country="Australia" officephone="+61 8 9216 5800" officefax="+61 8 9216 5888" />
+	<SITE name="Prominent Hill" street="Prominent Hill Mine Site" city="Prominent Hill" state="SA" postcode="" country="Australia" officephone="+61 8 8672 8100" officefax="+61 8 8672 8101" />
+<!--	<SITE name="Savannakhet" street="Sepon Gold &#45; Copper Operation" city="Vilabouly District" state="Savannakhet Province" postcode="" country="LAO PDR" officephone="+856 41 212 686" officefax="" />-->
+<!--	<SITE name="Sepon" street="Sepon Gold &#45; Copper Operation" city="Vilabouly District" state="Savannakhet Province" postcode="" country="LAO PDR" officephone="+61 8 6263 2180" officefax="" />-->
+	<SITE name="Thailand" street="15th Floor, Modernform Tower, Unit 1501, 699 Srinkarin" city="Suanluang" state="" postcode="10250" country="Thailand" officephone="" officefax="" />
+<!--	<SITE name="Vientiane" street="Ban Sisangvone" city="Saysetha District" state="Vientiane" postcode="" country="LAO PDR" officephone="+61 8 6263 2420" officefax="+856 2141 4293" />-->
+<!--	<SITE name="Wiluna" street="Via Wiluna" city="Wiluna" state="WA" postcode="6646" country="Australia" officephone="" officefax="" />-->
+
+
+ 
+
+	<departments>
+	  <department value="Administration" />
+	  <department value="Australian Operations" />
+	  <department value="Corporate Development" />
+	  <department value="Environment" />
+	  <department value="Exploration" />
+	  <department value="Exploration &amp; Resources" />
+	  <department value="Finance" />
+	  <department value="Geology" />
+	  <department value="Human Resources" />
+	  <department value="Information Technology" />
+	  <department value="Investor Relations" />
+	  <department value="Maintenance" />
+	  <department value="Managing Director" />
+	  <department value="Martabe" />
+	  <department value="Metallurgy" />
+	  <department value="Mining" />
+	  <department value="OHS" />
+	  <department value="Payroll" />
+	  <department value="Public Affairs" />
+	  <department value="Sales &amp; Marketing" />
+	  <department value="SPDG" />
+	  <department value="Technical Services" />
+	</departments>
+
+  <countrycodes>
+    <countrycode value="+84" />
+    <countrycode value="+855" />
+    <countrycode value="+856" />
+    <countrycode value="+86" />
+    <countrycode value="+61" />
+    <countrycode value="+62" />
+    <countrycode value="+66" />
+  </countrycodes>
+
+  <areacodes>
+    <areacode value="7" />
+    <areacode value="8" />
+    <areacode value="12" />
+    <areacode value="2" />
+    <areacode value="3" />
+    <areacode value="23" />
+    <areacode value="41" />
+    <areacode value="871" />
+    <areacode value="217" />
+    <areacode value="634" />
+  </areacodes>
+</root>

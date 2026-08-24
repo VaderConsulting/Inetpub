@@ -1,0 +1,112 @@
+<script language="vbscript" runat="server">
+CONST cLockFile = "D:\inetpub\Departmental Intranets\Production\IT Intranet\HardwareUpdater\Locked.txt"
+CONST cSessionTimeout = 1200
+
+sub Application_OnStart
+	Application("XMLFilePath") = "D:\inetpub\Departmental Intranets\Production\ITSupportDocuments\XML\"
+end sub
+
+sub Application_OnEnd
+  'some code
+end sub
+
+'when a new session starts, confirm that the user is the only one using the application
+sub Session_OnStart
+	
+	''define the local variables
+	'Dim FS
+	'Dim File
+	'Set FS = Server.CreateObject("Scripting.FileSystemObject")
+	'
+	'Session("LOGON") = Request.ServerVariables("LOGON_USER")
+	'
+	''check if the lock file exists
+	'If FS.FileExists(cLockFile) = True Then
+	'	
+	'	'check how long it has been since the file was last updated
+	'	Set File = FS.GetFile(cLockFile)
+	'	If DateDiff("s", file.DateLastModified, now) > cSessionTimeout Then
+	'		
+	'		'delete the file
+	'		File.Delete
+	'	Else
+	'		
+	'		'check the previous lock file and delete it if it was for the current user!
+	'		Set File = FS.OpenTextFile(cLockFile)
+	'		lstrTemp = File.ReadAll
+	'		file.close
+	'		if lstrTemp = Session("LOGON") Then
+	'			fs.Deletefile clockfile
+	'		Else
+	'			'clear this session
+	'			session.Abandon
+	'		
+	'			'inform the user that the XML file is currently in use
+	'			Response.Write "The XML is being modified by another user, please try again later!"
+	'			Response.End
+	'		End If			
+	'	End If
+	'End If
+	'
+	''create the locking file
+	'Set File = FS.CreateTextFile(cLockFile, false)
+	'File.Write Request.ServerVariables("LOGON_USER")
+	'File.close
+	'
+	''release the objects
+	'Set File = Nothing
+	'Set FS = Nothing
+	
+	LoadXML
+end sub
+
+'this subroutine will handle the end of a users session
+sub Session_OnEnd
+	
+	''define the local variables
+	'Dim FS
+	'Dim File
+	'Dim lstrTemp
+	'Set FS = Server.CreateObject("Scripting.FileSystemObject")
+	'
+	''check if the lock file exists
+	'If FS.FileExists(cLockFile) = True Then
+	'	
+	'	'File.Close
+	'	Set File = FS.OpenTextFile(cLockFile)
+	'	lstrTemp = File.ReadAll
+	'	File.Close
+	'	If lstrTemp = Session("LOGON") Then
+	'		fs.DeleteFile cLockFile
+	'	End If
+	'	
+	'	'release the objects
+	'	Set File = Nothing
+	'	Set FS = Nothing
+	'End If
+end sub
+
+Sub LoadXML
+
+	'define the XML object
+	Dim XML
+	Dim lobjNodes
+	Dim lvarTemp
+	Set XML = Server.CreateObject("MSXML2.DOMDocument")
+	
+	'load the XML
+	if XML.load(Application("XMLFilePath") & "Hardware.xml") = true then
+		
+		'store the XML object for later use
+		Set Session("XML") = XML
+	else
+		
+		'clear the session
+		Session.Abandon
+		
+		'inform the user that there was an error loading the XML file
+		Response.Write "Unable to read the XML Catalogue file..."
+		Response.End
+	end if
+End Sub
+</script>

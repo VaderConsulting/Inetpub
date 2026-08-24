@@ -1,0 +1,113 @@
+BODY, TABLE, INPUT, TEXTAREA, SELECT
+{
+	COLOR:			#555555;
+	FONT-FAMILY:		Arial, Verdana, Helvetica;
+	FONT-SIZE:		8pt;
+}
+A:Link, A:Visited
+{
+	COLOR:			#555555;
+	TEXT-DECORATION:	None;
+}
+A:Hover
+{
+	COLOR:			#cd142d;
+	FONT-WEIGHT:		Bold;
+}
+.HomeLink, .HomeLink A:Link, .HomeLink A:Visited
+{
+	BACKGROUND-COLOR:	#3C68AE;
+	COLOR:			#FFFFFF;
+	CURSOR:			Hand;
+	FONT-SIZE:		9pt;
+	FONT-WEIGHT:		Bold;
+	HEIGHT:			21px;
+	PADDING-LEFT:		5px;
+	PADDING-TOP:		2px;
+	TEXT-DECORATION:	None;
+}
+.HomeLink A:Hover
+{
+	COLOR:			#cd142d;
+}
+.Welcome
+{
+	COLOR:			#3C68AE;
+	FONT-SIZE:		9pt;
+	FONT-WEIGHT:		Bold;
+	PADDING-TOP:		3px;
+}
+.MenuItem
+{
+	BACKGROUND-COLOR:	#E8E8E8;
+	BACKGROUND-IMAGE:	URL('../Images/MenuBG.gif');
+	COLOR:			#555555;
+	FONT-SIZE:		9pt;
+	HEIGHT:			21px;
+	PADDING-LEFT:		20px;
+	TEXT-DECORATION:	None;
+}
+.MenuItemSelected
+{
+	BACKGROUND-COLOR:	#E8E8E8;
+	BACKGROUND-IMAGE:	URL('../Images/MenuBG.gif');
+	COLOR:			#555555;
+	FONT-SIZE:		9pt;
+	FONT-WEIGHT:		Bold;
+	HEIGHT:			21px;
+	PADDING-LEFT:		20px;
+}
+
+.SubMenuItem
+{
+	BACKGROUND-COLOR:	#FFFFFF;
+	BACKGROUND-IMAGE:	URL('../Images/SubMenuBG.gif');
+	COLOR:			#555555;
+	FONT-SIZE:		9pt;
+	HEIGHT:			21px;
+	PADDING-LEFT:		20px;
+	TEXT-DECORATION:	None;
+}
+.SubMenuItemSelected
+{
+	BACKGROUND-COLOR:	#FFFFFF;
+	BACKGROUND-IMAGE:	URL('../Images/SubMenuBG.gif');
+	COLOR:			#555555;
+	FONT-SIZE:		9pt;
+	FONT-WEIGHT:		Bold;
+	HEIGHT:			21px;
+	PADDING-LEFT:		20px;
+	TEXT-DECORATION:	None;
+}
+.MainHeading
+{
+	BACKGROUND-IMAGE:	URL('../Images/MainHeadingDivider.gif');
+	COLOR:			#3C68AE;
+	FONT-SIZE:		12pt;
+	FONT-WEIGHT:		Bold;
+	HEIGHT:			23px;
+	TEXT-TRANSFORM:		uppercase;
+}
+.SubHeading
+{
+	COLOR:			#3C68AE;
+	FONT-SIZE:		11px;
+	FONT-WEIGHT:		Bold;
+	TEXT-TRANSFORM:		uppercase;
+}
+.copyright {
+	TEXT-ALIGN:right; FONT-SIZE: 10px; COLOR: #646464; FONT-FAMILY: Arial, Verdana, Helvetica; TEXT-DECORATION: none
+}
+.copyright A:link {
+	FONT-SIZE: 10px; COLOR: #646464; FONT-FAMILY: Arial, Verdana, Helvetica; FONT-WEIGHT:Normal; TEXT-DECORATION: underline
+}
+.copyright A:visited {
+	FONT-SIZE: 10px; COLOR: #646464; FONT-FAMILY: Arial, Verdana, Helvetica; FONT-WEIGHT:Normal; TEXT-DECORATION: underline
+}
+.copyright A:hover {
+	FONT-SIZE: 10px; COLOR: #cd142d; FONT-FAMILY: Arial, Verdana, Helvetica; FONT-WEIGHT:Normal; TEXT-DECORATION: underline
+}
+.Warning
+{
+	COLOR:			#FF0000;
+}

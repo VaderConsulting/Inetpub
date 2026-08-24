@@ -1,0 +1,115 @@
+BODY
+{
+    FONT-SIZE: 12px;
+    COLOR: black;
+    FONT-FAMILY: Tahoma;
+    BACKGROUND-POSITION: left top;
+    BACKGROUND-ATTACHMENT: fixed;
+    BACKGROUND-IMAGE: none;
+    BACKGROUND-REPEAT: no-repeat
+}
+A
+{
+	FONT-SIZE: 12px;
+    COLOR: black;
+    FONT-FAMILY: Tahoma;
+    TEXT-DECORATION : none;
+    CURSOR: Hand;
+}
+TD
+{
+    FONT-SIZE: 12px;
+    COLOR: black;
+    FONT-FAMILY: Tahoma;
+    BACKGROUND-POSITION: left top;
+    BACKGROUND-ATTACHMENT: fixed;
+    BACKGROUND-IMAGE: none;
+    BACKGROUND-REPEAT: no-repeat
+}
+OPTION
+{
+    FONT-SIZE: 12px;
+    COLOR: teal;
+    FONT-FAMILY: Tahoma;
+    BACKGROUND-POSITION: left top;
+    BACKGROUND-ATTACHMENT: fixed;
+    BACKGROUND-IMAGE: none;
+    BACKGROUND-REPEAT: no-repeat
+}
+INPUT
+{
+    FONT-SIZE: 11px;
+    COLOR: black;
+    FONT-FAMILY: Tahoma;
+    BACKGROUND-POSITION: left top;
+    BACKGROUND-ATTACHMENT: fixed;
+    BACKGROUND-IMAGE: none;
+    BACKGROUND-REPEAT: no-repeat
+}
+.Highlight
+{
+    FONT-SIZE: 12px;
+    COLOR: red;
+}
+.WarningText
+{
+    FONT-WEIGHT: bolder;
+    FONT-SIZE: 12px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Tahoma
+}
+.SectionHeaderText
+{
+    FONT-WEIGHT: bolder;
+    FONT-SIZE: 16px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Tahoma
+}
+.ColumnHeaderText
+{
+    FONT-WEIGHT: bolder;
+    FONT-SIZE: 12px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Tahoma
+}
+.SmallText
+{
+    FONT-SIZE: smaller;
+    FONT-FAMILY: Tahoma
+}
+.InvisibleSpan
+{
+    DISPLAY: none;
+    VISIBILITY: hidden
+}
+.textbox
+{
+    BORDER-RIGHT: #999933 thin solid;
+    BORDER-TOP: #999933 thin solid;
+    FONT-SIZE: 8px;
+    BORDER-LEFT: #999933 thin solid;
+    COLOR: black;
+    BORDER-BOTTOM: #999933 thin solid;
+    FONT-FAMILY: Tahoma
+}
+.blockbg
+{
+    BACKGROUND-POSITION: right bottom;
+    BACKGROUND-ATTACHMENT: fixed;
+    BACKGROUND-IMAGE: url(../../Images/swish.gif);
+    BACKGROUND-REPEAT: no-repeat
+}
+.tabs
+{
+    FONT-SIZE: 10px;
+    COLOR: steelblue;
+    FONT-FAMILY: Tahoma;
+    BACKGROUND-COLOR: lightsteelblue;
+}
+.selectedtab
+{
+    FONT-SIZE: 11px;
+    COLOR: lightsteelblue;
+    FONT-FAMILY: Tahoma;
+    BACKGROUND-COLOR: steelblue;
+}

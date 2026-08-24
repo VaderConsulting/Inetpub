@@ -1,0 +1,323 @@
+<%@ Page Debug="true" %>
+<!--#include virtual="includes/dataaccess.inc"--> 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<%
+Dim i, j
+Dim User()
+Dim Username
+Dim StartTime, EndTime, HoursPerDay, MinorInterval, IntervalsPerHour, NoOfPeriods
+Dim ColWidth
+Dim LoopTime, DoHour, CurrentPeriod
+Dim Usr, AwayTime, ReturnTime, Person, Location, Returned
+Dim AddMode, LoopClass, PeriodNo, DisplayHour, TimeAway, TimeBack, LocationName
+Dim WorkDays, HereNow, Time1, Time2, thisHour, LoopHour
+
+'Get Username
+Usr = UCase(Request.ServerVariables("AUTH_USER"))
+i = InStr(Usr,"\")
+Username = Mid(Usr,i+1,Len(Usr)-i)
+Session("Username") = Username
+
+' Get form variables
+AwayTime = Request.Form("Away")
+ReturnTime = Request.Form("Return")
+Person = Request.Form("Person")
+Location = Request.Form("Location")
+
+' Get page variables
+  Returned = Request.QueryString("Returned")
+  If Returned = "1" Then
+    Person = Request.QueryString("Person")
+  End If
+
+If AwayTime <> "" or Returned = "1" then
+  AddMode = True
+Else
+  AddMode = False
+End If
+
+%>
+
+<html>
+<head>
+    <link rel='stylesheet' type='text/css' href='style.css'>
+    <META HTTP-EQUIV="REFRESH" CONTENT=60>
+    <title>Locator</title>
+</head>
+
+<body>
+    <div align='center' class='Body'>
+        Empired Locator
+    </div>
+    <br>
+    <div align='left' class='Body'>
+<!-- Username: <%=Username%>-->
+
+<script language="VBScript">
+  Function ClickTime(strTime)
+    If Schedule.AwayReturnToggle.value = "Away" Then
+      Schedule.Away.Value = strTime
+      Schedule.AwayReturnToggle.Value = "Return"
+    Else
+      Schedule.Return.Value = strTime
+      Schedule.AwayReturnToggle.Value = "Away"
+    End If
+  End Function
+</script>
+
+    <form name="Schedule" target="_self" method="post">
+<%
+  StartTime = CDate("08:00")
+  EndTime   = CDate("17:00")
+If AddMode Then
+  ' Update User location
+  ' Example: sp_UpdateLocatorTable 1,2,'10:30:00 AM', '11:30:00 AM'
+  If Returned <> "1" Then
+    If AwayTime = "" Then AwayTime = CStr(Now)
+    If ReturnTime = "" Then ReturnTime = CStr(EndTime)
+    SQL = "EXEC SP_UpdateLocatorTable " & Person & "," & Location & ",'" & AwayTime & "','" & ReturnTime & "'"
+  Else
+    SQL = "EXEC SP_UpdateLocatorTable " & Person & ",1,'',''"
+  End If
+  adoConn.Execute (SQL)
+End If
+
+  SQL = "Exec sp_Location_Overview"
+  adoRS.Open (SQL,adoConn)
+%>
+<hr>
+<%  ' Setup variables
+    HoursPerDay = DateDiff("h",StartTime,EndTime)
+    MinorInterval = 15 ' minutes <---- Do Not Change!!!
+    IntervalsPerHour = (60 / MinorInterval)
+    NoOfPeriods = IntervalsPerHour * HoursPerDay
+
+    ColWidth = 18
+
+    LoopClass = "TableHere"
+    Response.Write ("<!--" & vbcrlf)
+    Response.Write ("StartTime " & StartTime & vbcrlf)
+    Response.Write ("EndTime " & EndTime & vbcrlf)
+    Response.Write ("HoursPerDay " & HoursPerDay & vbcrlf)
+    Response.Write ("MinorInterval " & MinorInterval & vbcrlf)
+    Response.Write ("IntervalsPerHour " & IntervalsPerHour & vbcrlf)
+    Response.Write ("NoOfPeriods " & NoOfPeriods & vbcrlf)
+    Response.Write ("-->" & vbcrlf)
+    %>
+<table border='1' cellborder='0' cellpadding='0' cellspacing='0'>
+  <tr>
+    <td align='center'>&nbsp;</td>
+    <td align='center'>&nbsp;</td>
+    <td align='center'>Name</td>
+    <td align='center'>Location</td>
+<%  ' Draw Column Headers
+    CurrentPeriod = 1
+    LoopTime = formatdatetime(CDate(StartTime),DateFormat.LongTime)
+    For PeriodNo = 0 to NoOfPeriods
+      DoHour = False
+      If Int(PeriodNo / 4) = PeriodNo / 4 Then DoHour = True
+      If DoHour = True Then
+      DisplayHour = Hour(LoopTime)
+      If CInt(DisplayHour) > 12 Then DisplayHour = DisplayHour - 12%>
+        <td class="SmallText" align='center' width='<%=ColWidth%>'><%=DisplayHour%></td>
+<%      CurrentPeriod = 1
+      Else%>
+        <td class="SmallText" align='center' width='<%=ColWidth%>'>&nbsp;</td>
+<%      CurrentPeriod = CurrentPeriod + 1%>
+<%    End If%>
+<%    LoopTime = DateAdd("n",MinorInterval,CDate(LoopTime))%>
+<%  Next%>
+  </tr>
+<%' Extract/Print Usernames and Schedule
+  LoopTime = StartTime
+  LoopClass ="TableHere"
+  Do While not adoRS.EOF %>
+    <tr>
+      <td><a href="setreturned.aspx?Person=<%=adoRS("ID").Value%>&Returned=1" target="_self"><img src="images/task_complete.gif" border="0" width="11" alt="Set <%=adoRS("CName").Value%> as returned"></a>&nbsp;</td>
+      <td><a href="email.aspx?UserTo=<%=adoRS("ID").Value%>&UserFrom=redacted@example.com&CName=<%=adoRS("CName").Value%>&SName=<%=adoRS("SName").Value%>" target="_blank"><img src="images/email.gif" border="0"></a>&nbsp;</td>
+      <td class='TableCol1' width='150' nowrap><% =adoRS("CName").Value & " " & adoRS("SName").Value %></td>
+      <td class='TableCol2' width='100' nowrap>
+<%      TimeAway = adoRS("TimeAway").Value & ""
+        TimeBack = adoRS("TimeBack").Value & ""
+        
+        LocationName = adoRS("LocationName").Value
+        
+        ' Is this a work day for this person?
+        WorkDays = adoRS("WorkDays").Value
+        HereNow = Mid(WorkDays,WeekDay(Now),1)
+        If HereNow = "0" Then
+          LocationName = "Day off"
+          TimeAway = StartTime
+          TimeBack = EndTime
+        End If
+        
+        If LocationName = "Empired Office" Then %>
+<%        Response.Write ("&nbsp;")%>
+<%      Else%>
+<%        Response.Write ("&nbsp;" & LocationName)%>
+<%      End If%>
+      </td>
+<%    LoopTime = StartTime
+      For PeriodNo = 1 to NoOfPeriods + 1
+        If LocationName = "Empired Office" Then
+          LoopClass ="TableHere"
+        Else
+          If CDate(LoopTime) >= CDate(TimeAway) and CDate(LoopTime) <= CDate(TimeBack) Then
+            LoopClass = "TableAway"
+          Else
+            LoopClass ="TableHere"
+          End If
+        End If
+        %>
+        
+<%      ' Determine current quarter of the hour
+        Time1 = 0
+        Time1 = DatePart("n",TimeofDay)
+        If Time1 <= 15 Then Time2 = 0
+        If Time1 >15 And Time1 <= 30 Then Time2 = 15
+        If Time1 >30 And Time1 <= 45 Then Time2 = 30
+        If Time1 >45 Then Time2 = 45
+        Time1 = DateAdd("n",Time2,CDate(LoopTime))
+        
+        ThisHour = DatePart("h",TimeofDay)
+        LoopHour = DatePart("h",LoopTime)
+        If ThisHour = LoopHour And Minute(LoopTime) = Time2 Then
+          If LoopClass = "TableHere" Then LoopClass = "TableNow1"
+          If LoopClass = "TableAway" Then LoopClass = "TableNow2"
+        End If%>
+        <td align='center' class='<%=LoopClass%>' width='<%=ColWidth%>' Title="<%=FormatdateTime(LoopTime,DateFormat.LongTime)%> to <%=FormatDateTime(DateAdd("n",MinorInterval,LoopTime),DateFormat.LongTime)%>" onclick='ClickTime("<%=FormatDateTime(LoopTime,DateFormat.LongTime)%>")'>&nbsp;</td>
+<%      LoopTime = DateAdd("n",MinorInterval,LoopTime)
+      Next
+      LoopTime = StartTime%>
+    </tr>
+<%  adoRS.MoveNext
+  
+  Loop
+  adoRS.Close %>
+</table>
+<hr>
+<div class="SmallText">
+(<%=MinorInterval%>&nbsp;minute intervals, Start at <%=FormatDateTime(StartTime,DateFormat.LongTime)%>, End at <%=FormatDateTime(EndTime,DateFormat.LongTime)%>)
+
+<%If AddMode Then%>
+  <b>Data added</b>
+<%Else%>
+  <b>View Mode</b>
+<%End If%>
+
+</div>
+<br>
+<!-- Key to above table -->
+<table border='0' cellborder='0' cellpadding='0' cellspacing='0'>
+  <tr>
+    <td>
+      <table border='0' cellborder='0' cellpadding='0' cellspacing='0'>
+        <tr>
+          <td colspan='4' align="center">Key</td>
+        </tr
+        <tr>
+          <td width='<%=ColWidth%>' colspan='2' class = "TableAway">&nbsp;</td>
+          <td width='10'>&nbsp;</td>
+          <td width='100'>Away</td>
+        </tr>
+        <tr>
+          <td width='<%=ColWidth%>' colspan='2' class = "TableHere">&nbsp;</td>
+          <td width='10'>&nbsp;</td>
+          <td width='100'>&nbsp;Here&nbsp;</td>
+        </tr>
+        <tr>
+          <td width='<%=ColWidth/2%>' class = "TableNow1">&nbsp;</td>
+          <td width='<%=ColWidth/2%>' class = "TableNow2">&nbsp;</td>
+          <td width='10'>&nbsp;</td>
+          <td width='100'">&nbsp;Now&nbsp;</td>
+        </tr>
+        <tr>
+          <td width='<%=ColWidth%>' align="centre" colspan='2'><img src='images/email.gif'></td>
+          <td width='10'>&nbsp;</td>
+          <td width='100'>&nbsp;Send Email&nbsp;</td>
+        </tr>
+      </table>
+    </td>
+    <td valign='top' align='center'>
+      <table border='0' cellborder='0' cellpadding='0' cellspacing='0'>
+        <tr>
+          <td colspan='5' align='center'>Change Status</td>
+        </tr>
+        <tr>
+          <td align="centre">Person</td>
+          <td align="centre">Location</td>
+          <td>&nbsp;Away (hh:mm:ss AM/PM)&nbsp;</td>
+          <td>&nbsp;Return (hh:mm:ss AM/PM)&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td width='160'>
+            <select name="Person" id="Person" style="width: 150px;">
+<%
+  SQL = "Exec sp_Users"
+
+    adoRS.Open (SQL,adoConn)
+              ' Populate Users Listbox, setting selected username to the current username    %>
+<%            Do Until adoRS.EOF%>
+                <option value="<%=adoRS("ID").Value%>"<%If Username = adoRS("Username").Value Then %> selected <%End If%>><%=adoRS("CName").Value & " " & adoRS("SName").Value%>
+<%              adoRS.MoveNext
+              Loop
+            adoRS.Close%>
+          </td>
+          <td width='160'>
+            <select name="Location" id="Location" style="width: 150px;">
+<%
+              SQL = "Exec sp_Locations"
+              adoRS.Open (SQL,adoConn)
+              ' Populate Locations Listbox   %>
+<%            Do Until adoRS.EOF%>
+                <option value="<%=adoRS("ID").Value%>"><%=adoRS("LocationName").Value%>
+<%              adoRS.MoveNext
+              Loop
+            adoRS.Close%>
+          </td>
+          <td width='140'><input type="text" ID="Away" name="away" style="width: 130px;" readonly></td>
+          <td width='140'><input type="text" ID="Return" name="return" style="width: 130px;" readonly></td>
+          <td>&nbsp;<input type='submit' value='Save' style="width: 50px;">&nbsp;</td>
+        </tr>
+      </table
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="2" class="SmallRedtext">HINT: Select the person, then the location, (both from the list boxes) before clicking on the above grid to enter <i>Away</i> and <i>Return</i> times.</td>
+  </tr>
+  <tr>
+    <td colspan="2" class="SmallRedtext">NOTES:</td>
+  </tr>
+  <tr>
+    <td colspan="2" class="SmallRedtext">This location data is reset at midnight (except for <i>Not Contracted</i> and <i>Leave</i>).</td>
+  </tr>
+  <tr>
+    <td colspan="2" class="SmallRedtext"><i>Day Off</i>&nbsp;is entered automagically according to the persons Workdays.</td>
+  </tr>
+</table>
+<input type="hidden" name="AwayReturnToggle" ID="AwayReturnToggle" value="Away">
+<input type="hidden" name="Returned" ID="Returned" value="0">
+</form>
+    </div>
+<hr>
+<a href="/home">Home</a>
+</body>
+</html>
+
+<%
+  ' Server functions
+  'Private Function MakeDouble(StringIn) as string
+  '  Dim strOutput
+  '  If Len(strInput) = 1 Then
+  '    strOutput = "0" & StringIn
+  '  Else
+  '    strOutput = StringIn
+  '  End If
+  '  Return strOutput
+  'End Function
+%>

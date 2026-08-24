@@ -1,0 +1,233 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="Software.xsl"?>
+<SOFTWARE>
+	<GROUP title="Core Applications">
+		<ITEM desc="Trend Micro OfficeScan Client 7.0" status="Complete" />
+		<ITEM desc="Adobe Reader 7.05" status="Complete" />
+		<ITEM desc="Default Printer Allocator" status="Complete" />
+		<ITEM desc="Macromedia Shockwave Player 10.1.0.11" status="Complete" />
+		<ITEM desc="Microsoft Office Visio Viewer 11" status="Complete" />
+		<ITEM desc="Microsoft Windows Media Player 10" status="Complete" />
+		<ITEM desc="Quicktime Player 6.5" status="Complete" />
+		<ITEM desc="WinZip 9 SR1" status="Complete" />
+		<ITEM desc="Microsoft .NET Framework 1.1" status="Complete" />
+		<ITEM desc="Sun Java Runtime 5.0" status="Complete" />
+		<ITEM desc="Microsoft VB Runtime SP6" status="Complete" />
+		<ITEM desc="Installshield ISScript9 3.00" status="Complete" />
+		<ITEM desc="MSN Messenger 7.5" status="Complete" />
+		<ITEM desc="Adobe Reader Chinese Simplified Fonts" status="Complete" />
+		<ITEM desc="Adobe Reader Chinese Traditional Fonts" status="Complete" />
+		<ITEM desc="Macromedia Flash Player 8" status="Complete" />
+		<ITEM desc="Microsoft Access 2003 Runtime (CORE)" status="Complete" />
+		<ITEM desc="PST Backup Util" status="Complete" />
+		<ITEM desc="Microsoft Office 2003 Standard SP2 (CORE)" status="Complete" />
+		<ITEM desc="Alitirs (CORE)" status="Complete" />
+		<ITEM desc="Microsoft Office 2003 SP2" status="No longer Used" />
+		<ITEM desc="Macromedia Flash Player 7.0.19.0" status="No longer Used" />
+	</GROUP>
+	<GROUP title="Secondary Applications">	
+		<ITEM desc="RIM Blackberry" status="Complete" site="Melb" notes="" />
+		<ITEM desc="TextPad" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="UltraEdit" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="AutoCAD LT 2000i" status="Complete" site="GG" notes="" />
+		<ITEM desc="CASA Safety Management System" status="Complete" site="GG" notes="" />
+		<ITEM desc="CatBase Viewer" status="Complete" site="GG" notes="" />
+		<ITEM desc="C-Dilla Licence Management System" status="Complete" site="GG" notes="" />
+		<ITEM desc="Chem Alert 2.8.1 (RMT)" status="Complete" site="GG" notes="" />
+		<ITEM desc="DeLogger" status="Complete" site="GG" notes="" />
+		<ITEM desc="Delta-T5 Std" status="Complete" site="GG" notes="" />
+		<ITEM desc="Earthworks Data Source Drivers" status="Complete" site="GG" notes="" />
+		<ITEM desc="Earthworks Mine2-4D v10.1.2" status="Complete" site="GG" notes="" />
+		<ITEM desc="Earthworks Production Scheduler v1.0.1545.1" status="Complete" site="GG" notes="" />
+		<ITEM desc="ECW Compressor 2.2" status="Complete" site="GG" notes="" />
+		<ITEM desc="Equipment Manager" status="Complete" site="GG" notes="" />
+		<ITEM desc="ESBUnitConv 5.0.1" status="Complete" site="GG" notes="" />
+		<ITEM desc="Explorer3 RDBMS" status="Complete" site="GG" notes="" />
+		<ITEM desc="Flexlm for VULCAN 6 (Build 1883)" status="Complete" site="GG" notes="" />
+		<ITEM desc="GeoAccess Pro 2.9.2 (Widenbar)" status="Complete" site="GG" notes="New version provided by Widenbar. Validation Code: RC9056DJ64 Old Version: License Number: 5724 Access Code: -204263" />
+		<ITEM desc="Geographic Tracker 3.3" status="Complete" site="GG" notes="Source found on MAPINFO CD// downloaded" />
+		<ITEM desc="JKSimFloat" status="Complete" site="GG" notes="" />
+		<ITEM desc="JKSimMet V5.1" status="Complete" site="GG" notes="Requires Hardlock driver package" />
+		<ITEM desc="Map3D SV" status="Complete" site="GG" notes="Requires Sentinel Dongle Driver. Requires 'map3d.lic' (included). Unable to test, no dongle." />
+		<ITEM desc="MapImagery" status="Complete" site="GG" notes="Downloaded" />
+		<ITEM desc="MeasureIT 2 (FLEXIT)" status="Complete" site="GG" notes="" />
+		<ITEM desc="Mediaface" status="Complete" site="Melb" notes="Version 2.4.2 located. Serial provided" />
+		<ITEM desc="MICROMINE-Suite" status="Complete" site="GG" notes="Requires License File &amp; Hardlock Dongle Based" />
+		<ITEM desc="Mineral Exploration Reporting Templates Version 3 (DoIR)" status="Complete" site="GG" notes="Downloaded from Web: http://mapserver.mpr.wa.gov.au/datacentre/" />
+		<ITEM desc="MYOB" status="Complete" site="Melb" notes="" />
+		<ITEM desc="National Reporting Tool" status="Complete" site="GG" notes="Requires database to function" />
+		<ITEM desc="Oxiana FTP Password Changer (Empired)" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Pitram (micromine)" status="Complete" site="GG" notes="Requires ODBC Connection" />
+		<ITEM desc="Plant Performance Application (Aspect)" status="Complete" site="GG" notes="" />
+		<ITEM desc="SafeNet (Rainbow) Sentinel Driver 4.51" status="Complete" site="GG" notes="Dongle Driver" />
+		<ITEM desc="Solutions Electrical V 7.0 (Claymont)" status="Complete" site="GG" notes="8D18-47BD-94D7-E12E-B368-A54E-26A2-96DD-8FD3-91C6" />
+		<ITEM desc="Swedge" status="Complete" site="GG" notes="Serial: 398C626BG4ADFCGE Requires HARDLOCK drive package No DONGLE supplied - unable to test" />
+		<ITEM desc="TemCurve" status="Complete" site="GG" notes="" />
+		<ITEM desc="Unwedge 3.0" status="Complete" site="GG" notes="Serial: 398C626BG4ADFCGE Requires HARDLOCK drive package No DONGLE supplied - unable to test" />
+		<ITEM desc="VersaPro Ver 2.04 (GE Fanuc)" status="Complete" site="GG" notes="REQUIRE LICENSE ACTIVATION (Machine Based) Serial: 6896042783 Site Code: D0AA39A06DBFB3A6A0" />
+		<ITEM desc="VULCAN 6.0 (Build 1833)" status="Complete" site="GG" notes="" />
+		<ITEM desc="" status="Complete" site="GG" notes="Requires Sentinel Drives package &amp; Dongle" />
+		<ITEM desc="DeTransfer" status="Complete" site="GG" notes="" />
+		<ITEM desc="DeView (Datataker)" status="Complete" site="GG" notes="" />
+		<ITEM desc="Nero" status="Complete" site="M &amp; GG" notes="VLK for 20" />
+		<ITEM desc="ProFooty (Olympus)" status="Complete" site="Melb" notes="" />
+		<ITEM desc="TABS Client" status="Complete" site="GG" notes="" />
+		<ITEM desc="Chem Alert 2.8.2 (RMT)" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Dscaler Mpeg Decoders (for DVD Playback)" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Encom Discover 3D" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Encom Discover 7" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="ESG RockPro" status="Complete" site="GG" notes="" />
+		<ITEM desc="JKMetAccount" status="Complete" site="GG" notes="" />
+		<ITEM desc="MapInfo to Google Earth Export Utility" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Micrografx Graphics Suite 2 Enterprise" status="Complete" site="GG" notes="" />
+		<ITEM desc="Microsoft ActiveSync 3.8" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Microsoft ActiveSync 4.1" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Mine Reporting Database MRD II (RSG MINEBase)" status="Complete" site="GG" notes="" />
+		<ITEM desc="MineCAD (AST)" status="Complete" site="GG" notes="Requires Hardlware registration" />
+		<ITEM desc="MineMAX Planner 2.32" status="Complete" site="GG" notes="Unlicensed - appears to be unlicensed/ registered on current install aswell" />
+		<ITEM desc="MineWorks Planner (Crest)" status="Complete" site="GG" notes="" />
+		<ITEM desc="MiriMap 2000+" status="Complete" site="GG" notes="Machine ID Registration" />
+		<ITEM desc="Odin NetModem Client 2.13" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Snowden Protector" status="Complete" site="GG" notes="" />
+		<ITEM desc="Snowden SUPERVISOR v6.00.08" status="Complete" site="GG" notes="" />
+		<ITEM desc="Sonic Firewall Client" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Surpac Vision V5.0-M" status="Complete" site="GG" notes="New version" />
+		<ITEM desc="VEGA Visual Operating" status="Complete" site="GG" notes="" />
+		<ITEM desc="Bentley View" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Citrix ICA Client - Mincom" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="CosmoPlayer" status="Complete" site="M &amp; GG" notes="VRML viewer. Downloaded" />
+		<ITEM desc="DisplayIT (FLEXIT)" status="Complete" site="GG" notes="" />
+		<ITEM desc="Earthworks Mine2-4D v12" status="Complete" site="GG" notes="" />
+		<ITEM desc="GeoOrient" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Microsoft Office 2003 Chinese Simplified User Interface" status="Complete" site="Laos" notes="" />
+		<ITEM desc="Microsoft Windows XP Chinese (Simplified) User Interface 5.1.2600" status="Complete" site="Laos" notes="" />
+		<ITEM desc="NameWiz (SoftBtyeLabs)" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="OAG Travel Planner (Client)" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Panviva SupportPoint Author 6.2" status="Complete" site="M" notes="" />
+		<ITEM desc="Panviva SupportPoint Viewer 6.2" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="WebEx Meeting Manager for IE" status="Complete" site="Melb" notes="" />
+		<ITEM desc="AladdinUSB Hasp drivers (for Vulcan)" status="Complete" site="GG" notes="" />
+		<ITEM desc="Earthworks Mine2-4D 12.0.1611.2" status="Complete" site="GG" notes="" />
+		<ITEM desc="Earthworks Mine2-4D 12.0.168.0 SP" status="Complete" site="GG" notes="" />
+		<ITEM desc="EDMS" status="Complete" site="GG" notes="" />
+		<ITEM desc="eMims" status="Complete" site="GG" notes="" />
+		<ITEM desc="Haulage Analyzer" status="Complete" site="GG" notes="" />
+		<ITEM desc="Java 1.4.2" status="Complete" site="Corp" notes="" />
+		<ITEM desc="Nokia PC Suite" status="Complete" site="GG" notes="" />
+		<ITEM desc="Reflex Instrument SPROCESS (Maxibore)" status="Complete" site="GG" notes="" />
+		<ITEM desc="Table Editor" status="Complete" site="GG" notes="" />
+		<ITEM desc="Adobe Acrobat Professional 7.05" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Adobe Acrobat Standard 7.05" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Adobe Creatve Suite 2" status="Complete" site="Melb" notes="Uses wrapper for install (- adobe Pro - use adobe Pro installer). VBscript uninstalls apps seperately. Checks Adobe Pro 7 before installed rest of suite" />
+		<ITEM desc="ANZ Online" status="Complete" site="Melb" notes="Requires testing in Prod" />
+		<ITEM desc="Australian Standards Online" status="Complete" site="GG" notes="Shortcut to web - http://online.standards.com.au/online/" />
+		<ITEM desc="AutoCAD 2K6" status="Complete" site="GG" notes="REQUIRES ACTIVATION" />
+		<ITEM desc="Autodesk Learning Assistance" status="Complete" site="GG" notes="" />
+		<ITEM desc="Citrix ICA Client" status="Complete" site="GG" notes="" />
+		<ITEM desc="Corel Draw" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Dreamweaver" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Earthworks License Services" status="Complete" site="GG" notes="Requires ISScript9 package" />
+		<ITEM desc="Earthworks Visualizer v1.1.1250.0" status="Complete" site="GG" notes="" />
+		<ITEM desc="Fireworks" status="Complete" site="Melb" notes="Needs KEY to activated with Key on 1st run" />
+		<ITEM desc="GeoCalc" status="Complete" site="GG" notes="" />
+		<ITEM desc="Google Earth" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Hardlock Device" status="Complete" site="GG" notes="Require for other applications, eg JKSimMet" />
+		<ITEM desc="IRESS Felix 1.9 SP1" status="Complete" site="Melb" notes="" />
+		<ITEM desc="MapInfo 8" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Microsoft Windows XP Chinese User Interface 5.1.2600" status="Complete" site="Laos" notes="" />
+		<ITEM desc="Microsoft Windows XP Thai User Interface 5.1.2600" status="Complete" site="Laos" notes="" />
+		<ITEM desc="OAG Travel Planner" status="Complete" site="Melb" notes="" />
+		<ITEM desc="PDF Creator 0.8.1" status="Complete" site="GG" notes="" />
+		<ITEM desc="Pronto" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Ventsim version 3.8.2" status="Complete" site="GG" notes="" />
+		<ITEM desc="Weir Minerals wsCAT 2.0" status="Complete" site="GG" notes="" />
+		<ITEM desc="WinISA Regression (GM Minerals)" status="Complete" site="GG" notes="" />
+		<ITEM desc="Autodesk DWF Viewer" status="Complete" site="GG" notes="Replaces Volo View Express, AutoDesk Express Viewer and WHIP!" />
+		<ITEM desc="Microsoft Office 2003 Chinese Traditional User Interface" status="Complete" site="Laos" notes="" />
+		<ITEM desc="Microsoft Office 2003 Thai User Interface" status="Complete" site="Laos" notes="" />
+		<ITEM desc="Microsoft Producer for Microsoft Office PowerPoint 2003" status="Complete" site="GG" notes="Downloaded from Microsoft. Updated in Feb (shortcut)" />
+		<ITEM desc="Microsoft Project Professional 2003 SP2" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="Microsoft Visio Professional 2003 SP2" status="Complete" site="M &amp; GG" notes="" />
+		<ITEM desc="palmOne Tungsten T5 (Maxibore Prt2)" status="Complete" site="GG" notes="" />
+		<ITEM desc="Hyperion - Essbase add-in" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Aquire OrgPublisher" status="Complete" site="Melb" notes="" />
+		<ITEM desc="Microsoft Office 2003 Standard SP2 (CORE)" status="Complete" site="Corp" notes="" />
+		<ITEM desc="Microsoft Access 2003  " status="Complete" site="Corp" notes="" />
+		<ITEM desc="Microsoft Publisher 2003  " status="Complete" site="Corp" notes="" />
+		<ITEM desc="Explorer3 RDBMS Update" status="Complete" site="GG" notes="" />
+		<ITEM desc="Adobe Photoshop Elements" status="Complete" site="GG" notes="" />
+		<ITEM desc="Vulcan 6.0 SP4" status="Complete" site="GG" notes="" />
+		<ITEM desc="Gocad (Geoscience)" status="Complete" site="GG" notes="Requires GGMFPS01 license server" />
+		<ITEM desc="Gocad (Mira)" status="Complete" site="GG" notes="Requires GGMFPS01 license server" />
+		<ITEM desc="Hazard Incident Database (Shortcut)" status="Complete" site="GG" notes="" />
+		<ITEM desc="UPSilon 2000 (Mega Systems Tech)" status="Complete" site="GG" notes="" />
+		<ITEM desc="Cisco VPN SSL Client " status="Complete" site="Corp" notes="" />
+		<ITEM desc="SnagIT (TechSmith)" status="Complete" site="GG" notes="" />
+		<ITEM desc="SiteSafe" status="Complete" site="GG" notes="" />
+		<ITEM desc="Citrix ICA Client 9.150" status="Complete" site="Corp" notes="" />
+		<ITEM desc="Pronto ActiveFax" status="Complete" site="Melb" notes="" />
+		<ITEM desc="JKSimMet V5.2" status="Complete" site="GG" notes="" />
+		<ITEM desc="Sierra Wireless Card 580" status="Complete" site="Corp" notes="" />
+		<ITEM desc="TrainingProvider" status="Complete" site="GG" notes="" />
+		<ITEM desc="Earthworks Production Scheduler 1.0.1606.3" status="Complete" site="GG" notes="" />
+		<ITEM desc="Dips 5.103 (Rocscience)" status="Complete" site="Geo" notes="" />
+		<ITEM desc="Rowe Scientfic Catalogue" status="Complete" site="GG" notes="" />
+		<ITEM desc="Prolog" status="Complete" site="Adl" notes="" />
+		<ITEM desc="Primevera" status="Complete" site="Adl" notes="" />
+		<ITEM desc="Micromine 10.1.5" status="Complete" site="GG / Geo" notes="" />
+		<ITEM desc="Minrep" status="Complete" site="GG" notes="" />
+		<ITEM desc="eDrawings (Solidworks)" status="Complete" site="Sepon" notes="No Serial supplied or used - Professional functions disabled" />
+		<ITEM desc="AladdinUSB HL Hasp drivers 4.99 (Micromine 10.1.5)" status="Complete" site="GG" notes="" />
+		<ITEM desc="ChemAlert 2.9.1" status="Complete" site="GG" notes="" />
+		<ITEM desc="File Maker Pro" status="Complete" site="Sepon" notes="" />
+		<ITEM desc="Thai and Lao Fonts (Empired)" status="Complete" site="Sepon" notes="" />
+		<ITEM desc="Thai Dictionary V.4" status="Complete" site="Sepon" notes="Help characters do not display correctly - this is normal (confirmed by Noy)" />
+		<ITEM desc="EQWin 6.309 (Gemteck)" status="Complete" site="Sepon" notes="Requires Activation per PC. Database creation wont work for PLEB. Vendor says thats OK" />
+		<ITEM desc="SmartDraw 7" status="Complete" site="Sepon" notes="" />
+		<ITEM desc="MapInfo 8.5" status="Complete" site="Corp" notes="" />
+		<ITEM desc="Hyperion 9 BI Client" status="Complete" site="Corp" notes="Requires manual admin config Post Install. Has regedit warning" />
+		<ITEM desc="Encom 8.0" status="Complete" site="Corp" notes="" />
+		<ITEM desc=".NET Framework 2.0" status="Complete" site="Corp" notes="" />
+		<ITEM desc="LaoScript_v.6.0" status="Complete" site="Sepon" notes="" />
+		<ITEM desc="Fuel Management" status="Complete" site="Sepon" notes="Requires Post-Install Activation. Vendor install appears to give some app message when run." />
+		<ITEM desc="Win Situ LT" status="Complete" site="Sepon" notes="" />
+		<ITEM desc="Installshield11" status="Complete" site="Sepon" notes="Require for applications such as Win-Situ" />
+		<ITEM desc="MFD 2003" status="Complete" site="Sepon" notes="" />
+		<ITEM desc="Pitram (micromine) 2.1.9" status="In Progress" site="GG" notes="" />
+		<ITEM desc="PDF Converter" status="" site="Sepon" notes="Vendor MSI does not work with GP" />
+		<ITEM desc="AutoCAD 2007" status="" site="Sepon" notes="" />
+		<ITEM desc="ACCPAC" status="" site="Sepon" notes="" />
+		<ITEM desc="WinRAR" status="" site="Sepon" notes="Awaiting license" />
+		<ITEM desc="MineSched (surpac)" status="" site="Sepon" notes="Andy querying" />
+		<ITEM desc="MineSight" status="" site="Sepon" notes="" />
+		<ITEM desc="Data Loggers" status="" site="Sepon" notes="" />
+		<ITEM desc="Environ Data" status="" site="Sepon" notes="Requires registration details - Andy chasing up" />
+		<ITEM desc="Hydstra V9.03.02" status="" site="Sepon" notes="Awaiting Source &amp; Instructions" />
+		<ITEM desc="Pronto 6.5" status="" site="Sepon" notes="ON HOLD" />
+		<ITEM desc="Prediction Plus" status="" site="Sepon" notes="Awaiting Source &amp; Instructions" />
+		<ITEM desc="Sungard Integrity" status="" site="Corp" notes="Awaiting Source &amp; Instructions" />
+	</GROUP>
+
+	<GROUP title="Tertiary Applications">	
+		<ITEM desc="Divx" />
+		<ITEM desc="DSS" />
+		<ITEM desc="IPSwitch" />
+		<ITEM desc="OAG" />
+		<ITEM desc="Oxiana Backup wizard" />
+		<ITEM desc="Panasonic wireless manager" />
+		<ITEM desc="WinDVD (Toshiba)" />
+		<ITEM desc="Convert" />
+		<ITEM desc="Iress client 1.30 SP10" />
+		<ITEM desc="Wireless mouse - intellipoint" />
+		<ITEM desc="Bios upgrade tecra A3" />
+		<ITEM desc="Dreamweaver MX" />
+		<ITEM desc="FFD Show 20041012" />
+		<ITEM desc="Iheat" />
+		<ITEM desc="Macromedia - Fireworks - DreamweaverMX" />
+		<ITEM desc="OAG" />
+		<ITEM desc="SBS Moden Sharing" />
+	</GROUP>
+
+	<GROUP title="Other...">
+	</GROUP>
+</SOFTWARE>

@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<%
+' Active Directory Search.
+' Performs a search of the Active Directory on the selected Domain for User, Person, Group or Computer objects.
+
+'
+Dim Usr, i
+Dim DSN, adoConn, adoRS, adoCommand
+Dim SQL, CMDText
+Dim Criteria, SearchType, Strict, SearchIn
+Dim Username
+
+Const DomainName = "TUSK"
+'Const strUser = "drobinson"
+'Const strPassword = "REDACTED"
+
+Usr = UCase(Request.ServerVariables("AUTH_USER"))
+Criteria = Request.QueryString("Criteria")
+SearchType = Request.QueryString("SearchType")
+Strict = Request.QueryString("Strict")
+SearchIn = Request.QueryString("SearchIn")
+
+'Get Username
+i = InStr(Usr,"\")
+Username = Mid(Usr,i+1,Len(Usr)-i)
+Session("Username") = Username
+
+On Error Resume Next
+%>
+
+
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' href='style.css'>
+    <title>Locator</title>
+</head>
+
+<body>
+    <div align='center' class='Body'>
+        Empired Locator
+    </div>
+    <br>
+    <div align='left' class='Body'>
+<form target="_self">
+<!-- My Username is <%=UserName%>  -->
+<table>
+<tr>
+    <td>Search for</td>
+    <td><input type="text" name="Criteria" value="<%=Criteria%>"></td>
+    <td><input type ="submit"></td>
+</tr>
+<tr>
+    <td colspan='3'>
+        <table>
+            <tr>
+                <td>
+                    <table border="1" cellspacing="0" cellpadding="2" bordercolor="00000000">
+                        <tr bordercolor="ffffff">
+                            <td colspan="4" align="center">Search For</td>
+                        </tr>
+                        <tr bordercolor="ffffff">
+                            <td align='center'>User</td>
+                            <td align='center'>Person</td>
+                            <td align='center'>Group</td>
+                            <td align='center'>Computer</td>
+                        </tr>
+                        <tr bordercolor="ffffff">
+                            <td align='center'><input type="radio" name="SearchType" value="User" <%If SearchType="User" Or SearchType="" Then %>checked<%End If%>></td>
+                            <td align='center'><input type="radio" name="SearchType" value="Person" <%If SearchType="Person" Then %>checked<%End If%>></td>
+                            <td align='center'><input type="radio" name="SearchType" value="Group" <%If SearchType="Group" Then %>checked<%End If%>></td>
+                            <td align='center'><input type="radio" name="SearchType" value="Computer" <%If SearchType="Computer" Then %>checked<%End If%>></td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table border="1" cellspacing="0" cellpadding="2" bordercolor="00000000">
+                        <tr bordercolor="ffffff">
+                            <td colspan="4" align="center">Search In</td>
+                        </tr>
+                        <tr bordercolor="ffffff">
+                            <td align='center'>
+                                <span id="SearchIn"><select name="SearchIn" id="SearchIn" style="width: 150px;"></span>
+                                    <option value="cn" <%If SearchIn="cn" Then%> selected <%End If%>>Anywhere
+                                    <option value="givenName" <%If SearchIn="givenName" Then%> selected <%End If%>>Firstname
+                                    <option value="manager" <%If SearchIn="manager" Then%> selected <%End If%>>Manager
+                                    <option value="mobile" <%If SearchIn="mobile" Then%> selected <%End If%>>Mobile Phone Number
+                                    <option value="sn" <%If SearchIn="sn" Then%> selected <%End If%>>Surname
+                                    <option value="telephoneNumber" <%If SearchIn="telephoneNumber" Then%> selected <%End If%>>Telephone Number
+                                    <option value="title" <%If SearchIn="title" Then%> selected <%End If%>>Title
+                                </select>
+                            </td>
+                        </tr>
+                        <tr bordercolor="ffffff">
+                            <td>&nbsp;</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table border="1" cellspacing="0" cellpadding="2" bordercolor="00000000">
+                        <tr bordercolor="ffffff">
+                            <td colspan="4" align="center">Search Options</td>
+                        </tr>
+                        <tr bordercolor="ffffff">
+                            <td align='center'>Anywhere</td>
+                            <td align='center'>Begins with</td>
+                            <td align='center'>Ends with</td>
+                            <td align='center'>Strict</td>
+                        </tr>
+                        <tr bordercolor="ffffff">
+                            <td align='center'><input type="radio" name="Strict" value="No" <%If Strict="No" Or Strict = "" Then %>checked<%End If%>></td>
+                            <td align='center'><input type="radio" name="Strict" value="Begins" <%If Strict="Begins" Then %>checked<%End If%>></td>
+                            <td align='center'><input type="radio" name="Strict" value="Ends" <%If Strict="Ends" Then %>checked<%End If%>></td>
+                            <td align='center'><input type="radio" name="Strict" value="Strict" <%If Strict="Strict" Then %>checked<%End If%>></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+                        
+        </table>
+    </td>
+</tr>
+</table>
+</form>
+
+<%
+If Trim(Criteria) <> "" Then
+    set adoConn = Server.Createobject("adodb.Connection")
+    adoConn.Provider = "ADsDSOObject"
+    
+    'adoConn.Properties("User ID") = DomainName & "\" & strUser
+    'adoConn.Properties("Password") = strPassword
+    'adoConn.Properties("Encrypt Password") = True
+    adoConn.Open "DS Query" ', DomainName & "\" & strUser, strPassword
+    
+    Set adoCommand = CreateObject("ADODB.Command")
+    Set adoCommand.ActiveConnection = adoConn
+    
+    ' Compose search criteria from options selected.
+    If Strict = "No" Then Criteria = "*" & Criteria & "*"
+    If Strict = "Begins" Then Criteria = Criteria & "*"
+    If Strict = "Ends" Then Criteria = "*" & Criteria
+    
+    ' If searching for a group or computer, then use cn only.
+    If SearchType = "Group" or SearchType = "Computer" Then
+        SearchIn = "cn"
+    End If
+    
+    ' Create CommandText
+    CMDText = ""
+    CMDText = CMDText & "SELECT "
+    CMDText = CMDText & "givenName, displayName "
+    'CMDText = CMDText & "cn, department, description, division, mail, employeeID, facsimileTelephoneNumber, givenName, displayName, "
+    'CMDText = CMDText & "sn, manager, middleName, physicalDeliveryOfficeName, postalAddress, postalCode, homePhone, mobile, telephoneNumber, "
+    'CMDText = CMDText & "pager, title "
+    CMDText = CMDText & "FROM 'LDAP://DC=" & DomainName & ",DC=com,DC=au' "
+    CMDText = CMDText & "WHERE objectCategory = '" & SearchType & "' AND " & SearchIn & "='" & Criteria & "'"
+    
+    adoCommand.CommandText = CMDText
+    
+    Response.Write "<!--" & vbcrlf
+    Response.Write "adoCommand: " & adoCommand.CommandText & vbcrlf
+    Response.Write "-->" & vbcrlf
+    
+    Set adoRS = adoCommand.Execute
+    
+    Do Until adoRS.EOF
+        For i = 0 To adoRS.Fields.Count - 1
+             'on error resume next ' Required due to some attributes not available across all classes.
+             Response.Write adoRS.Fields(i).Value & ", " & vbcrlf
+             'on error goto 0
+        Next
+        Response.Write "<br>" & vbcrlf
+        adoRS.MoveNext
+    Loop
+End If
+%>
+    </div>
+
+</body>
+</html>

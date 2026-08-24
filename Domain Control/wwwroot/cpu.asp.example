@@ -1,0 +1,355 @@
+<%@ language="vbscript"%>
+
+<!--#include file="styles.inc"-->
+<%
+
+    Response.Expires = -1
+
+' ===========================================================================================================================
+' * Description
+'   This page produces a .gif file in the specified (or current) directory on the Web Server.
+'   The gif file holds the CPU Utilisation for the selected host, over the selected period.
+'   NOTE: It is possible to leverage off the ouput from this page to show CPU utilisation for multiple servers on a single page.
+' ===========================================================================================================================
+' Requirements:
+' * Office Web Components MUST be installed on the Web Server - min Version 9 (2000), but works fine with Version 10 (XP/2002)
+' * File System Object MUST be available on the Web Server
+' * The Local User IUSR_<SERVERNAME> (if using anonymous, otherwise every user wishing to view this page) MUST have create,
+'   modify and read permission to the directory the gif files are created in.
+'   This directory is not specified, and so is assigned to the current directory, ie where *this* file sits on the server.
+' * SQL Server / Database as specified in the DSN.
+' * IIS/PWS
+' * Database structure:
+'   tblCPU holds data.  
+'   The following T-SQL may be used to recreate this table:
+'    CREATE TABLE [dbo].[tblCPU] (
+'        [Value] [int] NULL ,
+'        [DateTime] [smalldatetime] NOT NULL ,
+'        [Hostname] [varchar] (15) NULL 
+'    ) ON [PRIMARY]
+'    GO
+'
+'    ALTER TABLE [dbo].[tblCPU] WITH NOCHECK ADD 
+'    CONSTRAINT [DF_tblCPU_DateTime] DEFAULT (getdate()) FOR [DateTime]
+'    GO
+'
+' ===========================================================================================================================
+' * Tested with Windows XP, IE6, SQL 7 (MSDE) SP2, IIS5.1, ASP.NET Beta 2 and Office XP
+' ===========================================================================================================================
+' * Produced with Homesite 4.5.2
+' ===========================================================================================================================
+' * References:
+'   Microsoft Office 2000 Visual Basic Programmer Guide (Microsoft Part No X03-89042)
+'   MSDN Library January 2001
+' ===========================================================================================================================
+' * Inputs
+'   Hostname - string representing the name of the queried 'Server'
+'     eg
+'      PERTH-SQLSVR
+'      PERTH-DATA-1
+'   MonthYear - string representing the period to report over 
+'     eg 
+'     1/2000
+'    12/2001
+'   Type - value representing whether to use Peak or Average values
+'     eg
+'     Peak
+'     Average
+'    
+' ===========================================================================================================================
+' * Called with:
+'   cpu.asp?hostname=PERTH-SQLSVR&MonthYear=1/2000&Type=Peak
+' ===========================================================================================================================
+' * Output files are standard gif's, sized as per GifX and GifY values, named as per the following:
+'   Hostname-Monthname Year-<type>.gif
+'   eg 
+'   Demo-November 2001-max.gif
+'   Demo-November 2001-avg.gif
+' ===========================================================================================================================
+' * All code in this page belongs to D. Robinson.
+'   This code may be reused and/or modified, with one condition:
+'   The following reference must stay with the code giving credit to the author.
+'
+'   Based on code developed by D. Robinson Nov 2001 (redacted@example.com)
+'
+' ===========================================================================================================================
+'   Code begins here
+'
+    Dim Hostname
+    Dim ThisYear
+    Dim TargetMonth
+    Dim TargetYear
+    Dim MonthYear
+    Dim QueryTime
+    Dim QueriesPerMonth
+    Dim GifX
+    Dim GifY
+    Dim xType
+    
+    GifX = 800 ' Width of exported .gif image
+    GifY = 600 ' Heigh of exported .gif image
+    
+    'Request hostname to query on.
+    Hostname = Request.QueryString("Hostname")
+    
+    'Request Month and Year to query on
+    MonthYear = Request.QueryString("MonthYear")
+    
+    'Request type to display
+    xType = Request.QueryString("Type")
+    
+    ' Create a FileSystemObject to provide access to files
+	Set Session("FSO") = CreateObject("Scripting.FileSystemObject")
+    
+    ' If hostname isn't specified, then provide a demo of capabilities
+    If Hostname = "" Then Hostname = "Demo"
+    
+    'Strip Month and Year from MonthYear
+    If MonthYear <> "" Then
+        Dim p
+        p = instr(1,MonthYear,"/")
+        TargetMonth = Left(MonthYear,p-1)
+        TargetYear = Right(MonthYear,4)
+    End If
+    
+    If xType & "" = "" Then 
+        xType = "Peak"
+    End If
+    
+    Response.Write "<html>" & vbcrlf
+    Response.Write "<body>" & vbcrlf
+    Response.Write "<div align='center'>" & vbcrlf
+    Response.Write "<h1>CPU Utilisation for " & Hostname & "</h1>" & vbcrlf
+    
+    Response.Write "<FORM action='cpu.asp' method='get' name='frmChooseMonth'>" & vbcrlf
+    Response.Write "<p> Select a period to see the CPU Utilisation for " & Hostname & ": " & vbcrlf
+    
+    ' Get this year, and last year
+    ThisYear = datepart("yyyy",now)
+    LastYear = ThisYear - 1
+    
+    Response.Write "<SELECT name='MonthYear'>" & vbcrlf
+        'Populate list with 12 months of last year
+        For lp = 1 To 12
+            Response.Write "    <OPTION "
+            If MonthYear = "" Then ' No Month and Year specified, so don't show a specific date.
+                Response.Write "value='" & lp & "/" & LastYear & "'>" & Monthname(lp) & " " & Lastyear & "</OPTION>" & vbcrlf
+            Else
+                If CInt(TargetMonth) = lp And CInt(TargetYear) = LastYear Then
+                    Response.Write "SELECTED " ' Ensure the current Month and Year is selected
+                End If
+                Response.Write "value='" & lp & "/" & LastYear & "'>" & Monthname(lp) & " " & Lastyear & "</OPTION>" & vbcrlf
+            End If
+        Next
+        
+        ' Populate list with each past month of this year, including the current
+        For lp = 1 To datepart("m",now)
+            Response.Write "    <OPTION "
+            If MonthYear = "" Then ' No Month and Year specified, so don't show a specific date, just the current.
+                If lp = datepart("m",now) Then Response.Write "SELECTED " ' Ensure the current Month and Year is selected
+            Else
+                If CInt(TargetMonth) = lp And CInt(TargetYear) = ThisYear Then
+                    Response.Write "SELECTED " ' Ensure the current Month and Year is selected
+                End If
+            End If
+            Response.Write "value='" & lp & "/" & ThisYear & "'>" & Monthname(lp) & " " & Thisyear & "</OPTION>" & vbcrlf
+        Next
+    Response.Write "</SELECT>"
+    
+    Response.Write "&nbsp;<INPUT type='submit' value='Go'>" & vbcrlf
+    If xType = "Peak" Then 
+        Response.Write "<input type='radio' name='Type' value='Peak' checked>Peak" & vbcrlf
+        Response.Write "<input type='radio' name='Type' value='Average'>Average" & vbcrlf
+    Else
+        Response.Write "<input type='radio' name='Type' value='Peak'>Peak" & vbcrlf
+        Response.Write "<input type='radio' name='Type' value='Average' checked>Average" & vbcrlf
+    End If
+    Response.Write "</p>" & vbcrlf
+    Response.Write "</FORM>" & vbcrlf
+    Response.Write "<hr>" & vbcrlf
+    
+    ' * HINT:
+    '   To make even better, you could:
+    '   Create VB Application that produced the .GIF's automatically periodically
+    '   This page would then only have to display the relevant file as an img
+    
+    If MonthYear <> "" Then
+        Dim DaysInMonth
+        Dim oChart
+        Dim c
+        Dim DayNo(31)
+        Dim Vals1(31)
+        Dim Vals2(31)
+        Dim Vals3(31)
+        Dim i
+        Dim SQL
+        Dim ValueNo
+        Dim adoConn
+        Dim adoRS
+        Dim DSN
+        Dim SQLServer
+        Dim DbName
+        Dim SQLType
+        
+        Set adoConn = Server.CreateObject("ADODB.Connection")
+        Set adoRS = Server.CreateObject("ADODB.Recordset")
+        
+        If xType = "Peak" Then 
+            SQLType = "Max"
+        Else
+            SQLType = "Avg"
+        End If
+        
+        On Error Resume Next ' Prevent Database errors from breaking the page
+        
+        SQLServer = "(Local)"        ' Change this to the name of your SQL Server
+        Username = "REDACTED"              ' Use the appropriate Username
+        'Password = ""       ' If blank password, don't use this line, otherwise this is required, with modification to the DSN below.
+        DbName = "Domain Control"    ' Use the appropriate Database
+        
+        ' Define Datasource Name
+        DSN = "Provider=SQLOLEDB.1;User ID="REDACTED";Initial Catalog=" & DbName & ";Data Source=" & SQLServer
+        
+        adoConn.Open DSN
+        
+        'Reset counter
+        ValueNo = 0
+        
+        ' How many days in the selected Month?
+        DaysinMonth = CInt(NoOfDaysinMonth("01 " & MonthName(TargetMonth) & " " & TargetYear))
+        
+        For i = 1 to DaysInMonth
+            Vals1(i) = 0
+            Vals2(i) = 0
+            Vals3(i) = 0
+            DayNo(i) = CStr(i)
+        Next
+        
+        ' For debugging
+        Response.Write "<!-- " & vbcrlf
+        Response.Write "Days in this month: " & DaysInMonth & vbcrlf
+        
+        Response.Write "Values are retrieved over the following periods:" & vbcrlf
+        Response.Write "Value 1: 00:00 to 06:59 (Midnight to 7:00 AM)" & vbcrlf
+        Response.Write "Value 2: 07:00 to 18:59 (7:00 AM to 7:00 PM)" & vbcrlf
+        Response.Write "Value 3: 19:00 to 23:59 (7:00 PM to Midnight)" & vbcrlf
+        
+        ' Query values for the chart
+        ' These values can come from any existing data source - just modify the DSN and the SQL Statement
+        For i = 1 To DaysInMonth
+            Response.Write "Day " & i & vbcrlf
+            'Split each day into 3 periods:
+            ' 00:00 to 06:59
+            ' 07:00 to 18:59
+            ' 19:00 to 23:59
+            '
+            ' Compose SELECT statement for the appropriate day - made up of Sub-Queries
+            SQL = "SELECT "
+            SQL = SQL & "(SELECT " & SQLType & " (Value) FROM tblCPU WHERE Datepart(""hh"",DateTime) < 7 AND Datepart(""d"",DateTime) = " & i & " AND Datepart(""m"",DateTime) = " & TargetMonth & " AND Datepart(""yyyy"",DateTime) = " & TargetYear & " AND Hostname = '" & Hostname & "') AS Value1, "
+            SQL = SQL & "(SELECT " & SQLType & " (Value) FROM tblCPU WHERE Datepart(""hh"",DateTime) > 6 AND Datepart(""hh"",DateTime) < 19 AND Datepart(""d"",DateTime) = " & i & " AND Datepart(""m"",DateTime) = " & TargetMonth & " AND Datepart(""yyyy"",DateTime) = " & TargetYear & " AND Hostname = '" & Hostname & "') AS Value2, "
+            SQL = SQL & "(SELECT " & SQLType & " (Value) FROM tblCPU WHERE Datepart(""hh"",DateTime) > 18 AND Datepart(""d"",DateTime) = " & i & " AND Datepart(""m"",DateTime) = " & TargetMonth & " AND Datepart(""yyyy"",DateTime) = " & TargetYear & " AND Hostname = '" & Hostname & "') AS Value3 "
+            
+            'Response.Write "<!-- SQL Statement:" & vbcrlf & SQL & "-->" & vbcrlf
+            adoRS.Open SQL, adoConn
+            ' Get all values for this day
+            If Not adoRS.EOF Then
+                Vals1(i) = Int(adoRS("Value1"))
+                Vals2(i) = Int(adoRS("Value2"))
+                Vals3(i) = Int(adoRS("Value3"))
+                
+                Response.Write "Value 1: " & Vals1(i) & vbcrlf
+                Response.Write "Value 2: " & Vals2(i) & vbcrlf
+                Response.Write "Value 3: " & Vals3(i) & vbcrlf
+                If Vals1(i) > 0 Then ValueNo = ValueNo + 1
+            End If
+            adoRS.Close
+        Next
+        
+        If ValueNo > 0 then
+            ' Create a Chart Object
+            Set oChart = CreateObject("OWC.Chart")
+            
+            oChart.Clear
+            
+            Set c = oChart.Constants
+            
+            ' Set the different parameters for the ChartSpace
+            oChart.Border.Color = c.chColorNone
+            
+            ' Get Month and use it to set the Caption
+            sCaption = "CPU Utilisation for " & Hostname & " in " & MonthName(CInt(TargetMonth)) & " " & TargetYear
+            
+            ' Add a chart and set parameters for the chart
+            oChart.Charts.Add
+            'oChart.Charts(0).Type = 0                                                               ' Column
+            oChart.Charts(0).Type = 6                                                               ' Line
+            oChart.Charts(0).SeriesCollection.Add                                                   ' Add only one collection of data
+            oChart.Charts(0).SeriesCollection(0).Caption = "00:00 to 06:59"                         ' Legend
+            oChart.Charts(0).SeriesCollection(0).SetData c.chDimCategories, c.chDataLiteral         ' Literal data, not linked data - Categories
+            oChart.Charts(0).SeriesCollection(0).SetData c.chDimValues, c.chDataLiteral, Vals1      ' Literal data, not linked data - Values
+            oChart.Charts(0).HasLegend = True                                                       ' Legend
+            oChart.Charts(0).Scalings(2).Maximum = 100                                              ' 100% is Max value, so set as so.
+            oChart.Charts(0).Scalings(2).Minimum = 0                                                ' 0 is Min value, so set as so.
+            oChart.Charts(0).HasTitle = True                                                        ' Put title on page
+            If xType = "Peak" Then
+                oChart.Charts(0).Title.Caption = "Peak CPU Utilisation"
+            Else
+                oChart.Charts(0).Title.Caption = "Average CPU Utilisation"
+            End If
+            oChart.Charts(0).Axes(c.chAxisPositionBottom).MajorUnit = 7                             ' every week
+            oChart.Charts(0).Axes(c.chAxisPositionBottom).MinorUnit = 1                             ' every day
+            oChart.Charts(0).Axes(c.chAxisPositionBottom).HasTitle = True
+            oChart.Charts(0).Axes(c.chAxisPositionBottom).Title.Caption = Hostname & " " & Monthname(TargetMonth) & " " & TargetYear
+            
+            oChart.Charts(0).SeriesCollection.Add                                                   ' Add another collection of data
+            oChart.Charts(0).SeriesCollection(1).Caption = "07:00 to 18:59"                         ' Legend
+            oChart.Charts(0).SeriesCollection(1).SetData c.chDimCategories, c.chDataLiteral         ' Literal data, not linked data - Categories
+            oChart.Charts(0).SeriesCollection(1).SetData c.chDimValues, c.chDataLiteral, Vals2      ' Literal data, not linked data - Values
+            
+            oChart.Charts(0).SeriesCollection.Add                                                   ' Add another collection of data
+            oChart.Charts(0).SeriesCollection(2).Caption = "19:00 to 23:59"                         ' Legend
+            oChart.Charts(0).SeriesCollection(2).SetData c.chDimCategories, c.chDataLiteral         ' Literal data, not linked data - Categories
+            oChart.Charts(0).SeriesCollection(2).SetData c.chDimValues, c.chDataLiteral, Vals3      ' Literal data, not linked data - Values
+            
+            ' Build filename to save chart in that file
+            If xType = "Peak" Then
+                sFname = Hostname & "-" & MonthName(TargetMonth) & " " & TargetYear & "-max.gif"
+            Else
+                sFname = Hostname & "-" & MonthName(TargetMonth) & " " & TargetYear & "-avg.gif"
+            End If
+            
+            ' Export the chart to the file
+            oChart.ExportPicture server.MapPath(sFname), "gif", GifX, GifY
+            
+            ' Create a link to the generated file
+            Response.Write "-->" & vbcrlf
+            Response.Write "<img src='" & sFname & "'>"        
+            adoConn.Close
+            Set adoRS = Nothing
+            Set adoConn = Nothing
+        Else
+            Response.Write "There is no data for " & Hostname & " in " & MonthName(TargetMonth) & " " & TargetYear & "<br>" & vbcrlf
+        End If
+    End If
+    Response.Write "</div>" & vbcrlf
+    Response.Write "</body>" & vbcrlf
+    Response.Write "</html>" & vbcrlf
+    
+    Function NoofDaysinMonth(xDate)
+        'Determines the number of days in a given month.
+        mon = Month(xDate)
+        Select Case mon
+            Case 1, 3, 5, 7, 8, 10, 12
+                NoofDaysinMonth = 31
+            Case 4, 6, 9, 11
+                NoofDaysinMonth = 30
+            Case 2
+                mon = Month(xDate)
+                If Year(xDate) Mod 4 = 0 Then
+                    NoofDaysinMonth = 29
+                Else
+                    NoofDaysinMonth = 28
+                End if
+        End Select
+    End Function     
+%>

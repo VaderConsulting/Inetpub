@@ -1,0 +1,43 @@
+<!--#include file="Database.asp"-->
+<% 
+
+  Dim rsSignedupSearch, Attending
+  strSQL = "SELECT * FROM Attendings WHERE LanID = " & Request("LanID")
+  Set rsSignedupSearch = Server.CreateObject("ADODB.Recordset")
+  rsSignedupSearch.Open strSQL, objConn
+Attending = "FALSE"
+  Do While Not rsSignedupSearch.EOF
+ 	If Session("UserID") = rsSignedupSearch("UserID") then
+		Attending = "TRUE"
+	End If
+  	rsSignedupSearch.MoveNext
+  Loop
+  rsSignedupSearch.close
+  Set rsSignedupSearch = Nothing
+
+If Attending = "TRUE" AND Request("Remove") = "FALSE" then
+	Response.Redirect "signup.asp?Attending=TRUE"
+End If
+
+  Dim rsAttending
+  Set rsAttending = Server.CreateObject("ADODB.Recordset")
+  rsAttending.Open "Attendings", objConn, adOpenForwardOnly, adLockOptimistic, adCmdTable
+
+  If Not Request("Remove") = "TRUE" then
+	rsAttending.AddNew
+	rsAttending("UserID") = Session("UserID")
+	rsAttending("LanID") = Request("LanID")
+	rsAttending.Update
+  Else
+  	rsAttending.Filter = "UserID = "REDACTED"UserID") & " AND LanID = " & Request("LanID")
+	rsAttending.Delete
+  End If
+
+
+rsAttending.Close
+Set rsAttending = Nothing
+
+Response.Redirect "menu_for_registered_users.asp?Signup=Successful"
+
+
+ %>

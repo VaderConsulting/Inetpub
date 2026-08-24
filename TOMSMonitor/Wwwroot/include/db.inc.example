@@ -1,0 +1,13 @@
+<%
+    Dim SQLServerName
+    Dim DSN
+    Dim adoConn
+    Dim adoRS
+    
+    Set adoConn = CreateObject("ADODB.Connection")
+    Set adoRS = CreateObject("ADODB.Recordset")
+    Set adoRS2 = CreateObject("ADODB.Recordset")
+    
+    SQLServername = "DELLP1000"
+    DSN = "Provider=SQLOLEDB.1;Initial Catalog=TOMSMonitor;Data Source=" & SQLServerName & ";Language=British English;User ID=REDACTED"
+%>

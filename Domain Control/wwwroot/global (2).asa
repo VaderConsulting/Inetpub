@@ -1,0 +1,10 @@
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+
+Sub Session_OnStart
+	' At start of session, run this code
+End Sub
+
+Sub Session_OnEnd
+	' At end of session run this code
+End Sub
+</SCRIPT>

@@ -1,0 +1,11 @@
+<%
+Dim DSN, adoConn, adoRS, SQL
+
+'DSN = "Provider=SQLOLEDB.1;Integrated Security=SSPI;Persist Security Info=True;Initial Catalog=Empired;Data Source=(Local)"
+DSN = "DSN=Empired;UID=REDACTED;PWD=REDACTED"
+
+adoConn = CreateObject("ADODB.Connection")
+adoConn.Open (DSN)
+
+adoRS = CreateObject("ADODB.Recordset")
+%>

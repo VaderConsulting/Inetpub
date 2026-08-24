@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<info>
+	<infoitem key="UD_Recordset1" value="name:ID;datatype:INTEGER,name:lanName;datatype:LONGCHAR,name:lanDate;datatype:LONGCHAR,name:lanTime;datatype:LONGCHAR,name:lanAddress;datatype:LONGCHAR,name:lanContact;datatype:LONGCHAR,name:lanAlchohol;datatype:LONGCHAR,name:lanAges;datatype:LONGCHAR,name:lanCost;datatype:LONGCHAR,name:lanNotes;datatype:LONGCHAR" />
+</info>

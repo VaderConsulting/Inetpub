@@ -1,0 +1,10 @@
+<SCRIPT Language='VBScript' RUNAT='SERVER'>
+Sub Session_OnStart
+    'Get Username
+    Dim Usr, i
+    Usr = UCase(Request.ServerVariables("AUTH_USER"))
+    i = InStr(Usr,"\")
+    Session("Username") = Mid(Usr,i+1,Len(Usr)-i)
+    Session("DSN") = "Provider=SQLOLEDB.1;User ID=REDACTED;Initial Catalog=Timekeeper;Data Source=(Local);Language=British English;"
+End Sub
+</SCRIPT>

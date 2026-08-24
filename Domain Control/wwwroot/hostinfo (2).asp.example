@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<!--#include file="styles.inc"-->
+<head>
+	<title>Hostinfo</title>
+</head>
+
+<body>
+<SCRIPT LANGUAGE="VBScript" FOR="Window" EVENT="OnLoad">
+    parent.frames.item(1).window.location.href="left.asp?referringpage=ComputerInfo"
+</SCRIPT>
+<%
+    response.expires = -1
+    Dim SQL
+    Dim DSN
+    Dim adoRS
+    Dim adoConn
+    Dim SQLServer
+    Dim Username
+    Dim i
+    Dim NoOfColumns
+    Dim ColumnWidth
+    
+    Hostname = Request.QueryString("Hostname")
+    
+    Set adoConn = Server.CreateObject("ADODB.Connection")
+    Set adoRS = Server.CreateObject("ADODB.Recordset")
+    
+    SQLServer = "(Local)"
+    Username = "REDACTED"
+    
+    DSN = "Provider=SQLOLEDB.1;User ID="REDACTED";Initial Catalog=Domain Control;Data Source=" & SQLServer
+    
+    adoConn.Open DSN
+    SQL = "SELECT * FROM tblHosts WHERE Hostname = '" & Hostname & "'"
+    adoRS.Open SQL, adoConn
+    
+    Response.write "<div align='center'>" & vbcrlf
+    If adoRS("isUp") Then 
+        Response.Write "<h2><image src = 'images/ok.gif'>"
+    Else
+        Response.Write "<h2><image src = 'images/stop.gif'>"
+    End If
+    
+    Response.Write "&nbsp;" & Hostname & "&nbsp;"
+    
+    If adoRS("isUnix") = 0 Then 
+        If Instr(1,Ucase(adoRS("Type")),"2000") <> 0 Then Response.Write "<image src = 'images/windows_2000.gif' alt = 'Windows 2000' width='25'>"
+        If Instr(1,Ucase(adoRS("Type")),"NT") <> 0 Then Response.Write "<image src = 'images/windows_nt.gif' alt = 'Windows NT' width='25'>"
+        If Instr(1,Ucase(adoRS("Type")),"XP") <> 0 Then Response.Write "<image src = 'images/windows_xp.gif' alt = 'Windows XP' width='25'>"
+    Else
+        Response.Write "<image src = 'images/sun.gif' alt = 'Unix' width='25'>"
+    End If
+    
+    Response.Write "</h2>" & vbcrlf
+    Response.Write "</div>" & vbcrlf
+    
+    Response.Write "    <strong>Domain:</strong>&nbsp;" & vbcrlf
+    if Trim(adoRS("Domainname") & "" ) <> "" Then
+        Response.Write adoRS("Domainname") & "<br>" & vbcrlf
+    Else
+        Response.Write "UNKNOWN" & "<br>" & vbcrlf
+    End If
+    
+    Response.Write "    <strong>IP Address:</strong>&nbsp;"
+    If adoRS("IP") & "" <> "" Then
+        Response.Write adoRS("IP") & "<br>" & vbcrlf
+    Else
+        Response.Write "UNKNOWN" & "<br>" & vbcrlf
+    End If
+    
+    Response.Write "    <strong>Operating System:</strong>&nbsp;" & vbcrlf
+    if Trim(adoRS("Type") & "" ) <> "" Then
+        Response.Write adoRS("Type") & "<br>" & vbcrlf
+    Else
+        If adoRS("isUnix") = 0 Then
+            Response.Write "UNKNOWN" & "<br>" & vbcrlf
+        Else
+            Response.Write "Unix" & "<br>" & vbcrlf
+        End If
+   End If
+%>
+    <br>
+    <hr>
+    <strong>Services Provided:</strong><br>
+<%
+    Response.Write "    <table>" & vbcrlf
+    If adoRS("isPDC") Then 
+        Response.Write "        <tr>" & vbcrlf
+        Response.Write "            <td valign='middle'><image src='images/pdc.gif' width='18'>&nbsp;PDC&nbsp;&nbsp;</td>" & vbcrlf
+        Response.Write "            <td valign='middle'><a href='manage.asp?hostname=" & Hostname & "'><image src='images/details.gif' border='0' alt='Manage'></a></td>" & vbcrlf
+        Response.Write "        </tr>" & vbcrlf
+    End If
+    If adoRS("isDC") Then 
+        Response.Write "        <tr>" & vbcrlf
+        Response.Write "            <td valign='middle'><image src='images/dc.gif' width='18'>&nbsp;BDC&nbsp;&nbsp;</td>" & vbcrlf
+        Response.Write "            <td valign='middle'><a href='manage.asp?hostname=" & Hostname & "'><image src='images/details.gif' border='0' alt='Manage'></a></td>" & vbcrlf
+        Response.Write "        </tr>" & vbcrlf
+    End If
+    If adoRS("isPrint") Then 
+        Response.Write "        <tr>" & vbcrlf
+        Response.Write "            <td valign='middle'><image src='images/netprinter.gif' width='18'>&nbsp;Print Server</td>"
+        Response.Write "            <td valign='middle'>&nbsp;</td>" & vbcrlf
+        Response.Write "        </tr>" & vbcrlf
+    End If
+    If adoRS("isSQL") Then 
+        Response.Write "        <tr>" & vbcrlf
+        Response.Write "            <td valign='middle'><image src='images/server_database.gif' width='18'>&nbsp;SQL Server</td>"
+        Response.Write "            <td valign='middle'>&nbsp;</td>" & vbcrlf
+        Response.Write "        </tr>" & vbcrlf
+    End If
+    If adoRS("isBrowser") Then
+        Response.Write "        <tr>" & vbcrlf
+        Response.Write "            <td valign='middle'><image src='images/server_browser.gif' width='18'>&nbsp;Browser</td>"
+        Response.Write "            <td valign='middle'>&nbsp;</td>" & vbcrlf
+        Response.Write "        </tr>" & vbcrlf
+    End If
+    If adoRS("isTime") Then
+        Response.Write "        <tr>" & vbcrlf
+        Response.Write "            <td valign='middle'><image src='images/time-server.gif' width='18'>&nbsp;Time Source</td>"
+        Response.Write "            <td valign='middle'>&nbsp;</td>" & vbcrlf
+        Response.Write "        </tr>" & vbcrlf
+    End If
+    If adoRS("isTS") Then
+        Response.Write "        <tr>" & vbcrlf
+        Response.Write "            <td valign='middle'><image src='images/server_ts.gif' width='18'>&nbsp;Terminal Server</td>"
+        Response.Write "            <td valign='middle'>&nbsp;</td>" & vbcrlf
+        Response.Write "        </tr>" & vbcrlf
+    End If
+    If adoRS("isMSCS") Then
+        Response.Write "        <tr>" & vbcrlf
+        Response.Write "            <td valign='middle'><image src='images/cluster.gif' width='18'>&nbsp;Microsoft Clustering Services</td>"
+        Response.Write "            <td valign='middle'>&nbsp;</td>" & vbcrlf
+        Response.Write "        </tr>" & vbcrlf
+    End If
+    
+    Response.Write "    </table>" & vbcrlf
+    Response.Write "<br><hr>" & vbcrlf
+    If adoRS("Type") & "" = "" Then
+        Response.Write "    <image src='images/warning.gif'>&nbsp;Host details not able to be retrieved, possibly due to security mis-configuration.<br>" & vbcrlf
+        Response.Write "    <image src='images/info.gif'>&nbsp;<a href ='getinfo.asp?hostname=" & Hostname & "'>Attempt anyway.</a>" & vbcrlf
+    ElseIf adoRS("isUp") Then
+        Response.Write "    <image src='images/info.gif'>&nbsp;Retrieve detailed <a href ='getinfo.asp?hostname=" & Hostname & "'>Information.</a>" & vbcrlf
+    Else
+        Response.Write "    <image src='images/stop.gif'>&nbsp;Further information currently not available." & vbcrlf
+    End If
+    Response.Write "<br>" & vbcrlf
+    Response.Write "    <image src='images/ping.gif'>&nbsp;Ping" & vbcrlf
+    adoRS.Close
+    adoConn.Close
+%>
+<br>
+<br>
+<a href="javascript:history.back(1)">Back</a>
+</body>
+</html>
+<%
+    Set adoRS = Nothing
+    Set adoConn = Nothing
+%>

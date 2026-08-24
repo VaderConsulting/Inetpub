@@ -1,0 +1,33 @@
+<%
+' Constants
+'Const CONST_CONNECTION_STRING = "Provider=SQLOLEDB.1;User ID=REDACTED;pwd=REDACTED;Initial Catalog=Dos_D;Data Source=DACTST06;Language=British English;"
+Const CONST_CONNECTION_STRING = "Provider=SQLOLEDB.1;User ID=REDACTED;Initial Catalog=Dos_D;Data Source=(Local);Language=British English;"
+Const CONST_DIALOGWINDOW_PROPERTIES = "center:yes;help:no;scroll:no;status:no"
+Const CONST_Path = "http://127.0.0.1/PersonalHomepages/Homepages/"
+
+' CursorTypeEnum Values
+Const adOpenForwardOnly = 0
+Const adOpenKeyset = 1
+Const adOpenDynamic = 2
+Const adOpenStatic = 3
+' LockTypeEnum Values
+Const adLockReadOnly = 1
+Const adLockPessimistic = 2
+Const adLockOptimistic = 3
+Const adLockBatchOptimistic = 4
+' CursorLocationEnum Values
+Const adUseServer = 2
+Const adUseClient = 3
+
+Const adCmdStoredProc = 4
+Const adChar = 129
+Const adVarChar = 200
+Const adParamInput = 1
+Const adParamOutput = 2
+Const adParamReturnValue = 4
+
+' Global variables
+Dim i, j, k
+Dim strSQL
+
+%>

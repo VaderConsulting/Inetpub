@@ -1,0 +1,124 @@
+<!--#include file="Database.asp"-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Signup to a LAN</title>
+<!-- InstanceEndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+.standard {
+	font-family: Geneva, Arial, Helvetica, san-serif;
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	color: #333333;
+	text-decoration: none;
+}
+.content {
+	font-family: Geneva, Arial, Helvetica, san-serif;
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	color: #000000;
+	text-decoration: none;
+}
+a {
+	font-family: Geneva, Arial, Helvetica, san-serif;
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	color: #333333;
+	text-decoration: none;
+}
+-->
+</style>
+</HEAD>
+<BODY bgcolor="#666666">
+
+<table border=1>
+<tr>
+<th>Attending?</th>
+<th>LAN Date</th>
+<th>Cost</th>
+<th>Curr PPL</th>
+<th>Max PPL</th>
+<th>Waiting List</th>
+<th>Full</th>
+<th>Signup/Remove</th>
+<th>View</th>
+</tr>
+<% 
+
+  Dim rsLANSearch 
+  strSQL = "SELECT * FROM LANs "
+  Set rsLANSearch = Server.CreateObject("ADODB.Recordset")
+  rsLANSearch.Open strSQL, objConn
+
+  Dim rsAttendingSearch 
+	strSQL = "SELECT * FROM Attendings WHERE UserID = "REDACTED"UserID") & ";"
+	Set rsAttendingSearch = Server.CreateObject("ADODB.Recordset")
+	rsAttendingSearch.Open strSQL, objConn
+  
+    Dim rsAttendingCount, Count
+	strSQL = "SELECT * FROM Attendings"
+	Set rsAttendingCount = Server.CreateObject("ADODB.Recordset")
+	rsAttendingCount.Open strSQL, objConn
+  	
+  Do While Not rsLANSearch.EOF
+    rsAttendingSearch.Filter = "LanID=" & rsLANSearch("LanID")
+  	Count = 0
+  Dim Attending
+ 	If FormatDateTime(rsLANSearch("LANDate"),0) >= Date then
+		Response.Write "<tr align=center>"
+		If Not rsAttendingSearch.EOF then
+			Response.Write "<td><font color=#FF0000>Yes</font></td>"
+			Attending = "TRUE"
+		Else
+			Response.Write "<td>No</td>"
+			Attending = "FALSE"
+		End If
+		Response.Write "<td>" & FormatDateTime(rsLANSearch("LANDate"),1) & "</td>"
+		Response.Write "<td>$" & rsLANSearch("Cost") & "</td>"
+		rsAttendingCount.Filter = "LanID = " & rsLANSearch("LanID")
+		Do While Not rsAttendingCount.EOF
+			Count = Count + 1
+			rsAttendingCount.MoveNext
+		Loop
+		Response.Write "<td>" & Count & "</td>"
+		Response.Write "<td>" & rsLANSearch("MaxPPL") & "</td>"
+		Response.Write "<td>" & (Count-rsLANSearch("MaxPPL")) & "</td>"
+		If Count >= rsLANSearch("MaxPPL") then
+			Response.Write "<td><font color=#FF0000>Yes</font></td>"
+		Else
+			Response.Write "<td>No</td>"
+		End If
+		If Attending = "TRUE" Then
+			Response.Write "<td><a href=SignuptoLAN.asp?Remove=TRUE&LanID=" & rsLANSearch("LanID") & ">Remove from LAN</a></td>"
+		Else
+			Response.Write "<td><a href=SignuptoLAN.asp?LanID=" & rsLANSearch("LanID") & ">Signup</a></td>"
+		End if
+		Response.Write "<td><a href=View.asp?LanID=" & rsLANSearch("LanID") & ">View</a></td>"
+		Response.Write "</tr>"
+	End If
+
+  rsLANSearch.MoveNext
+  Loop
+  rsLANSearch.close
+  Set rsLANSearch = Nothing
+
+ %>
+	</table>
+
+</body>
+</html>

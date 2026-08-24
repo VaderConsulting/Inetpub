@@ -1,0 +1,658 @@
+<%@Language = VBScript%>
+<!-- #Include file="Includes/Menu.asp" -->
+<%
+
+	response.expires = 0
+
+	Dim ServiceAccount
+	ServiceAccount = Application("ADServiceAccount")
+	Dim ServicePassword
+	ServicePassword =REDACTED"ADServicePassword")
+
+	Const ADS_SECURE_AUTHENTICATION = 1
+	Const ADS_USE_ENCRYPTION = 2
+	Const ADS_PROPERTY_CLEAR = 1
+	Const ADS_PROPERTY_UPDATE = 2
+
+  ' Lists of values for Department, Phone Country Code
+  Dim intCount
+  Dim arrDepts(12)
+  intCount = 0
+  arrDepts(intCount) = "Administration":intCount = intCount + 1
+  arrDepts(intCount) = "Australian Operations":intCount = intCount + 1
+  arrDepts(intCount) = "Corporate Development":intCount = intCount + 1
+  arrDepts(intCount) = "Exploration & Resources":intCount = intCount + 1
+  arrDepts(intCount) = "Finance":intCount = intCount + 1
+  arrDepts(intCount) = "Human Resources":intCount = intCount + 1
+  arrDepts(intCount) = "Information Technology":intCount = intCount + 1
+  arrDepts(intCount) = "Investor Relations":intCount = intCount + 1
+  arrDepts(intCount) = "Managing Director":intCount = intCount + 1
+  arrDepts(intCount) = "Payroll":intCount = intCount + 1
+  arrDepts(intCount) = "Public Affairs":intCount = intCount + 1
+  arrDepts(intCount) = "Sales & Marketing":intCount = intCount + 1
+  arrDepts(intCount) = "Technical Services":intCount = intCount + 1
+  Dim arrPhoneCC(6)
+  intCount = 0
+  arrPhoneCC(intCount) = "+61":intCount = intCount + 1
+  arrPhoneCC(intCount) = "+62":intCount = intCount + 1
+  arrPhoneCC(intCount) = "+66":intCount = intCount + 1
+  arrPhoneCC(intCount) = "+84":intCount = intCount + 1
+  arrPhoneCC(intCount) = "+855":intCount = intCount + 1
+  arrPhoneCC(intCount) = "+856":intCount = intCount + 1
+  arrPhoneCC(intCount) = "+86":intCount = intCount + 1
+  Dim arrPhoneAC(7)
+  intCount = 0
+  arrPhoneAC(intCount) = "2":intCount = intCount + 1
+  arrPhoneAC(intCount) = "3":intCount = intCount + 1
+  arrPhoneAC(intCount) = "7":intCount = intCount + 1
+  arrPhoneAC(intCount) = "8":intCount = intCount + 1
+  arrPhoneAC(intCount) = "12":intCount = intCount + 1
+  arrPhoneAC(intCount) = "23":intCount = intCount + 1
+  arrPhoneAC(intCount) = "41":intCount = intCount + 1
+  arrPhoneAC(intCount) = "871":intCount = intCount + 1
+
+	'Define the local variables
+	Dim lstrUserAccount
+	Dim lstrDisplayUser
+	Dim llngCounter
+	Dim lstrErrorMessage
+	Dim lblnHideFields
+	
+	'define the recordset objects
+	Dim adoConn
+	Dim adoCmd
+	Dim adoRS
+	
+	'Grab the users account details
+	lstrUserAccount = UCASE(Request.ServerVariables("LOGON_USER"))
+	lstrDisplayUser = UCASE(Replace(lstrUserAccount, "OXIANA\", ""))
+	
+	'check if the user has posted some information back
+	If (len(request.form("ADSPath")) > 0) Then
+		
+		'The user has changed their information, so update AD
+		Dim lstrTelephoneNumber
+		Dim lstrCompany
+		Dim lstrSt
+		Dim lstrHomePhone
+		Dim lstrStreetAddress
+		Dim lstrFacsimileTelephoneNumber
+		Dim lstrDescription
+		Dim lstrPostalCode
+		Dim lstrPhysicalDeliveryOfficeName
+		Dim lstrMobile
+		Dim lstrL
+		Dim lstrTitle
+		Dim lstrDepartment
+		Dim lstrOfficePhone
+		Dim lstrOfficeFax
+		Dim lstrCountryCode
+		Dim lstrAssistantDN
+		
+		'grab the users new details and make sure that they have entered valid data
+		If len(Request.Form("PhoneCC")) > 0 Then
+			lstrTelephoneNumber = lstrTelephoneNumber & Request.Form("PhoneCC") & " "
+		End If
+		If Len(Request.Form("PhoneAC")) > 0 Then
+			lstrTelephoneNumber = lstrTelephoneNumber & Request.Form("PhoneAC") & " "
+		End If
+		lstrTelephoneNumber = lstrTelephoneNumber & Request.Form("TelephoneNumber")
+		
+		If len(Request.Form("FaxCC")) > 0 Then
+			lstrFacsimileTelephoneNumber = lstrFacsimileTelephoneNumber & Request.Form("FaxCC") & " "
+		End If
+		If Len(Request.Form("FaxAC")) > 0 Then
+			lstrFacsimileTelephoneNumber = lstrFacsimileTelephoneNumber & Request.Form("FaxAC") & " "
+		End If
+		lstrFacsimileTelephoneNumber = lstrFacsimileTelephoneNumber & Request.Form("FacsimileTelephoneNumber")
+		
+		If len(Request.Form("MobileCC")) > 0 Then
+			lstrMobile = lstrMobile & Request.Form("MobileCC") & " "
+		End If
+		If Left(Request.Form("Mobile"), 1) = "0" Then
+			lstrMobile = lstrMobile & mid(Request.Form("Mobile"), 2, len(Request.form("Mobile")))
+		Else
+			lstrMobile = lstrMobile & Request.Form("Mobile")
+		End If
+				
+		lstrCompany = Request.Form("Company")
+		lstrSt = Request.Form("St")
+		lstrStreetAddress = Request.Form("StreetAddress")
+		lstrDescription = Request.Form("Description")
+		lstrPostalCode = Request.Form("PostalCode")
+		lstrPhysicalDeliveryOfficeName = Request.Form("PhysicalDeliveryOfficeName")
+		lstrL = Request.Form("L")
+		lstrTitle = Request.Form("Title")
+		lstrDepartment = Request.Form("Department")
+		lstrCountryCode = Request.Form("Country")
+		lstrOfficePhone = Request.Form("OfficePhone")
+		lstrOfficeFax = Request.Form("OfficeFax")
+		lstrAssistantDN = Request.Form("AssistantDN")
+		
+		'define the loval variables/objects
+		Dim objLDAPProvider
+		Dim objUser
+		
+		'create the LDAP Provider object
+		Set objLDAPProvider = GetObject("LDAP:")
+		
+		'locate the AD user for editing
+		Set objUser = objLDAPProvider.OpenDSObject(Request.Form("ADSPath"), ServiceAccount, ServicePassword, ADS_SECURE_AUTHENTICATION)
+		
+		'save the new information into AD
+		If Len(lstrTelephoneNumber) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "telephoneNumber", vbNull
+		Else
+			objUser.TelephoneNumber = lstrTelephoneNumber
+		End If
+		If Len(lstrCompany) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "Company", vbNullString
+		Else
+			objUser.Company = lstrCompany
+		End If
+		If Len(lstrSt) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "st", vbNullString
+		Else
+			objUser.St = lstrSt
+		End If
+		If Len(lstrStreetAddress) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "StreetAddress", vbNullString
+		Else
+			objUser.StreetAddress = lstrStreetAddress
+		End If
+		If Len(lstrFacsimileTelephoneNumber) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "FacsimileTelephoneNumber", vbNullString
+		Else
+			objUser.FacsimileTelephoneNumber = lstrFacsimileTelephoneNumber
+		End If
+		If Len(Trim(lstrDescription)) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "Description", vbNullString
+		Else
+			objUser.Description = lstrDescription
+		End If
+		If Len(lstrPostalCode) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "PostalCode", vbNullString
+		Else
+			objUser.PostalCode = lstrPostalCode
+		End If
+		If Len(lstrPhysicalDeliveryOfficeName) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "PhysicalDeliveryOfficeName", vbNullString
+		Else
+			objUser.PhysicalDeliveryOfficeName = lstrPhysicalDeliveryOfficeName
+		End If
+		If Len(lstrMobile) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "Mobile", vbNullString
+		Else
+			objUser.Mobile = lstrMobile
+		End If
+		If Len(lstrL) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "L", vbNullString
+		Else
+			objUser.L = lstrL
+		End If
+		If Len(lstrTitle) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "Title", vbNullString
+		Else
+			objUser.Title = lstrTitle
+		End If
+		If Len(lstrDepartment) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "Department", vbNullString
+		Else
+			objUser.Department = lstrDepartment
+		End If
+		If Len(lstrCountryCode) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "co", vbNullString
+		Else
+			objUser.co = lstrCountryCode
+		End If
+		
+		If Len(lstrOfficePhone) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "OtherTelephoneNumber", vbNullString
+		Else
+			objUser.PutEx ADS_PROPERTY_UPDATE, "OtherTelephone", Array(lstrOfficePhone)
+		End If
+		If Len(lstrOfficeFax) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "OtherFacsimileTelePhoneNumber", vbNullString
+		Else
+			objUser.PutEx ADS_PROPERTY_UPDATE, "OtherFacsimileTelePhoneNumber", Array(lstrOfficeFax)
+		End If
+		
+		If Len(lstrAssistantDN) = 0 Then
+			objUser.PutEx ADS_PROPERTY_CLEAR, "Assistant", vbNullString
+		Else
+			objUser.Assistant = lstrAssistantDN
+		End If
+
+		'apply the changes
+		On Error Resume Next
+		objUser.SetInfo
+		If (Err.Number <> 0) Then
+		  lstrErrorMessage = "<SPAN style=""COLOR:#FF0000"">An error was encountered while trying to update the AD database. Please contact an administrator.</SPAN><BR><BR>"
+		  lstrErrorMessage = lstrErrorMessage + "<!-- (" + CStr(Err.Number) + ") " + Err.Description + " -->"
+		  Err.Clear
+		Else
+   		lstrErrorMessage = "<SPAN style=""COLOR:#FF0000"">Your Active Directory details were successfully updated.</SPAN><BR><BR>"
+		End If
+		On Error Goto 0
+		
+		'release the objects
+		Set objUser = Nothing
+		Set objLDAPProvider = Nothing
+		
+	End If 
+
+	'create the connection object
+	Set adoConn = CreateObject("ADODB.Connection")
+	
+	'Attempt to locate the user account in AD
+	adoConn.Provider = "ADsDSOObject"
+	adoConn.Properties("User ID") = ServiceAccount
+	adoConn.Properties("Password") = ServicePassword
+	adoConn.Properties("ADSI Flag") = 1
+	adoConn.Properties("Encrypt Password") = True
+	adoConn.Open "ADSI"
+	Set adoCmd = CreateObject("ADODB.Command")
+	Set adoCmd.ActiveConnection = adoConn
+	adoCmd.CommandText = "<LDAP://DC=Oxiana,DC=com,DC=au>;(&(objectCategory=user)(sAMAccountName=" + lstrDisplayUser + "));ADsPath,CN,givenName,mail,sn,telephoneNumber,company,st,streetAddress,facsimileTelephoneNumber,description,postalcode,physicalDeliveryOfficeName,mobile,l,title,Department,countryCode,co,otherfacsimiletelephonenumber,otherTelephone,Assistant;subtree"
+	On Error Resume Next
+	Set adoRS = adoCmd.Execute
+	On Error Goto 0
+	
+	
+	If UCase(typename(adoRS)) = "EMPTY" Then
+		lstrErrorMessage = "<SPAN style=""COLOR:#FF0000"">An error was encountered while trying to connect to the AD database. Please contact an administrator.</SPAN>"
+		lblnHideFields = True
+	ElseIf adoRS.EOF Then
+		lstrErrorMessage = "<SPAN style=""COLOR:#FF0000"">The specified user account could not be found.</SPAN>" + "<!-- " + adoCmd.CommandText + " -->"
+		lblnHideFields = True
+	else
+		CurrentCountryCode = adoRS.Fields("CountryCode")
+	End If
+	
+	on error resume next
+	Dim TempArray
+	Dim Phone, PhoneCC, PhoneAC
+	Phone = Trim(adoRS.Fields("TelephoneNumber"))
+	TempArray = Split(Phone, " ")
+	If (CheckCountryCode(TempArray(0)) = True) And (CheckAreaCode(TempArray(1)) = True) Then
+		PhoneCC = TempArray(0)
+		PhoneAC = TempArray(1)
+		Phone = Replace(Phone, PhoneCC & " " & PhoneAC & " ", "")
+	else
+		PhoneCC = ""
+		PhoneAC = ""
+	End If
+	
+	Dim Fax, FaxCC, FaxAC
+	Fax = Trim(adoRS.Fields("FacsimileTelephoneNumber"))
+	TempArray = Split(Fax, " ")
+	If (CheckCountryCode(TempArray(0)) = True) And (CheckAreaCode(TempArray(1)) = True) Then
+		FaxCC = TempArray(0)
+		FaxAC = TempArray(1)
+		Fax = Replace(Fax, FaxCC & " " & FaxAC & " ", "")
+	else
+		FaxCC = ""
+		FaxAC = ""
+	End If
+	
+	Dim Mobile, MobileCC, MobileAC
+	Mobile = Trim(adoRS.Fields("Mobile"))
+	TempArray = Split(Mobile, " ")
+	If (CheckCountryCode(TempArray(0)) = True) Then
+		MobileCC = TempArray(0)
+		Mobile = Replace(Mobile, MobileCC & " ", "")
+	else
+		MobileCC = ""
+	End If
+	On Error Goto 0
+	
+'this function will check if the specified country code matches on of the known values
+'returns true if the country code is known, otherwise false	
+Function CheckCountryCode(CC)
+  Dim intCount
+
+  CheckCountryCode = False
+  
+  For intCount = LBound(PhoneCC) To UBound(PhoneCC)
+    If (PhoneCC(intCount) = CC) Then
+      CheckCountryCode = True
+      Exit Function
+    End If
+  Next
+End Function
+
+'this function will check if the specified area code matches on of the known values
+'returns true if the area code is known, otherwise false
+Function CheckAreaCode(AC)
+  Dim intCount
+
+  CheckAreaCode = False
+  
+  For intCount = LBound(PhoneAC) To UBound(PhoneAC)
+    If (PhoneAC(intCount) = AC) Then
+      CheckAreaCode = True
+      Exit Function
+    End If
+  Next
+End Function
+%>
+<HTML>
+<HEAD>
+	<TITLE>IT Intranet: Update My Details</TITLE>
+	<link rel="stylesheet" href="Styles/Style.css" type="text/css"></link>
+	<SCRIPT language=JavaScript>
+	<!--
+	var XML;
+	var XMLHasLoaded;
+	function HideNonPrintables()
+	{
+		for (Counter=0;Counter<HidePrint.length;Counter++) HidePrint[Counter].style.display = 'None';
+	}
+	function ShowNonPrintables()
+	{
+		for (Counter=0;Counter<HidePrint.length;Counter++) HidePrint[Counter].style.display = 'Inline';
+	}
+	function LoadXML()
+	{
+		XML = new ActiveXObject("microsoft.XMLDOM");
+		XML.async = false;
+		if (XML.load('ITSupportDocuments/XML/OxianaSites.xml') == true) XMLLoaded();
+	}
+	function XMLLoaded()
+	{
+		XMLHasLoaded = true;
+		
+		var Counter;
+		
+		if (document.forms.frmUpdateDetails.Site != null)
+		{
+			var Sites = XML.getElementsByTagName('SITE');
+			document.forms.frmUpdateDetails.Site.add(new Option('-- Select a Site --'));
+			for (Counter=0;Counter<Sites.length;Counter++)
+			{
+				if ((Sites[Counter].attributes.getNamedItem('street').nodeValue == '<%= Trim(adoRS.Fields("StreetAddress"))%>') && (Sites[Counter].attributes.getNamedItem('officephone').nodeValue == document.forms.frmUpdateDetails.OfficePhone.value))
+				{
+					var x = new Option(Sites[Counter].attributes.getNamedItem('name').nodeValue);
+					x.selected = true;
+					document.forms.frmUpdateDetails.Site.add(x);
+				}
+				else
+				{
+					document.forms.frmUpdateDetails.Site.add(new Option(Sites[Counter].attributes.getNamedItem('name').nodeValue));
+				}
+			}
+		}
+	}
+	
+	function SiteSelected(SelectedSite)
+	{
+		var Sites = XML.getElementsByTagName('SITE');
+		
+		if (SelectedSite == '-- Select a Site --')
+		{
+			document.forms.frmUpdateDetails.StreetAddress.value = '';
+			document.forms.frmUpdateDetails.L.value = '';
+			document.forms.frmUpdateDetails.St.value = '';
+			document.forms.frmUpdateDetails.PostalCode.value = '';
+			document.forms.frmUpdateDetails.Country.value = '';
+			document.forms.frmUpdateDetails.OfficePhone.value = '';
+			document.forms.frmUpdateDetails.OfficeFax.value = '';
+		}
+		else
+		{
+			for (Counter=0;Counter<Sites.length;Counter++)
+			{
+				if (Sites[Counter].attributes.getNamedItem('name').nodeValue == SelectedSite)
+				{
+					document.forms.frmUpdateDetails.StreetAddress.value = Sites[Counter].attributes.getNamedItem('street').nodeValue;
+					document.forms.frmUpdateDetails.L.value = Sites[Counter].attributes.getNamedItem('city').nodeValue;
+					document.forms.frmUpdateDetails.St.value = Sites[Counter].attributes.getNamedItem('state').nodeValue;
+					document.forms.frmUpdateDetails.PostalCode.value = Sites[Counter].attributes.getNamedItem('postcode').nodeValue;
+					document.forms.frmUpdateDetails.Country.value = Sites[Counter].attributes.getNamedItem('country').nodeValue;
+					document.forms.frmUpdateDetails.OfficePhone.value = Sites[Counter].attributes.getNamedItem('officephone').nodeValue;
+					document.forms.frmUpdateDetails.OfficeFax.value = Sites[Counter].attributes.getNamedItem('officefax').nodeValue;
+					return 0;
+				}
+			}
+		}
+	}
+	function AssistantSearch()
+	{
+		var Temp = window.showModalDialog('AssistantDialogue.asp', document.forms.frmUpdateDetails.AssistantDN.value, 'dialogheight:275px;dialogwidth=406px');
+		if (Temp != null)
+		{
+			document.forms.frmUpdateDetails.PersonalAssistant.value = Temp.substring(Temp.indexOf('|') + 1, Temp.indexOf('|') + 100);
+			document.forms.frmUpdateDetails.AssistantDN.value = Temp.substring(0, Temp.indexOf('|'));
+		}
+	}
+
+	function RemoveAssistant()
+	{
+	  document.forms.frmUpdateDetails.PersonalAssistant.value = '';
+	  document.forms.frmUpdateDetails.AssistantDN.value = '';
+  }
+
+	//-->
+	</SCRIPT>
+</HEAD>
+
+<BODY onload="LoadXML()" onbeforeprint="HideNonPrintables()" onafterprint="ShowNonPrintables()">
+	<TABLE width=770 cellpadding=0 cellspacing=0 align=center width=770>
+		<TR id=HidePrint height=79><TD colspan=3 background=Images/Logo.gif align=right class=Copyright><A href="SiteMap.asp">Site Map</A><IMG align="absmiddle" width=19 height=12 src="Images/PrivacyDivider.gif"><A href="ContactUs.asp">Contact Us</A></TD></TR>
+		<TR id=HidePrint><TD colspan=3><IMG height=11 width=770 src="Images/DottedLine.gif"></TD></TR>
+		<TR id=HidePrint>
+			<TD width=190><DIV class=HomeLink><A href="index.asp" width=100%>HOME</A></DIV></TD>
+			<TD width=10>&nbsp;</TD>
+			<TD width=570>&nbsp;</TD>
+		</TR>
+		<TR id=HidePrint><TD colspan=3><IMG height=11 width=770 src="Images/DottedLine.gif"></TD></TR>
+		<TR>
+			<TD id=HidePrint width=190 valign=top>
+				<TABLE cellpadding=0 cellspacing=0 width=100%>
+					<%ShowMenu%>
+				</TABLE>
+			</TD>
+			<TD width=10></TD>
+			<TD width=570 valign=top>
+				<SPAN class=MainHeading style="display:inline;width:460px; height:21px">Update My Details</SPAN><SPAN class=Copyright style="padding-top:6px;padding-right:25px;display:inline;width:110px;HEIGHT:21px;cursor:hand;BACKGROUND-IMAGE:url('Images/PrintArrow.gif')" onclick="window.print()">Print this page</SPAN><BR><BR>
+				
+				<%= lstrErrorMessage%>
+				
+				<%If lblnHideFields <>  True Then%>
+				Please check the following fields to ensure that your details are correctly entered. The information contained here will be used in the OXIANA Global Address Book.
+				<FORM name="frmUpdateDetails" action="UpdateDetails.asp" method=post>
+					<TABLE cellpadding=0 cellspacing=0>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Given Name:&nbsp;</TD>
+							<TD><%= Trim(adoRS.Fields("GivenName"))%></TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Last Name:&nbsp;</TD>
+							<TD><%= Trim(adoRS.Fields("SN"))%></TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Email:&nbsp;</TD>
+							<TD><%= Trim(adoRS.Fields("Mail"))%></TD>
+						</TR>
+						<TR><TD>&nbsp;</TD></TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Job Title:&nbsp;</TD>
+							<TD><INPUT  name="Title" value="<%= Trim(adoRS.Fields("Title"))%>"></TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Department:&nbsp;</TD>
+							<TD>
+								<SELECT name="Department">
+<% For intCount = LBound(arrDepts) To UBound(arrDepts)
+     Response.Write "									<option"
+     If Trim(adoRS.Fields("Department")) = arrDepts(intCount) Then Response.Write " selected"
+     Response.Write " value=""" + Server.HTMLEncode(arrDepts(intCount)) + """>" + Server.HTMLEncode(arrDepts(intCount)) + "</option>" + VbCrLf
+   Next
+%>
+								</SELECT>
+							</TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Company:&nbsp;</TD>
+							<TD>
+								<SELECT name=Company>
+									<OPTION value="">-- Not Specified --</OPTION>
+									<OPTION value="Oxiana" <%If Trim(adoRS.Fields("Company")) = "Oxiana" Then Response.write "Selected" End If%>>Oxiana</OPTION>
+									<OPTION value="Empired" <%If Trim(adoRS.Fields("Company")) = "Empired" Then Response.write "Selected" End If%>>Empired</OPTION>
+									<OPTION value="Mincom" <%If Trim(adoRS.Fields("Company")) = "Mincom" Then Response.write "Selected" End If%>>Mincom</OPTION>
+								</SELECT>
+							</TD>
+						</TR>
+						<TR><TD>&nbsp;</TD></TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Personal Assistant:&nbsp;<BR><DIV style="FONT-WEIGHT:Normal;TEXT-TRANSFORM:None">(if applicable)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</DIV></TD>
+							<TD><INPUT readonly name="PersonalAssistant" value="<%
+							Set adoCmd2 = CreateObject("ADODB.Command")
+							Set adoCmd2.ActiveConnection = adoConn
+							adoCmd.CommandText = "<LDAP://DC=Oxiana,DC=com,DC=au>;(&(objectCategory=user));givenName,sn,distinguishedname;subtree"
+							'On Error Resume Next
+							Set adoRS2 = adoCmd.Execute
+							On Error Goto 0
+							While not adoRS2.EOF
+								If adoRS2.Fields("DistinguishedName") = adoRS.fields("Assistant") Then
+									Response.Write adors2.fields("SN") & ", " & adors2.fields("GivenName")
+									adoRS2.MoveLast
+								End If
+								adoRS2.MoveNext
+							Wend
+							%>"><INPUT type=hidden name=AssistantDN value="<%= adoRS.fields("Assistant")%>"><INPUT style="WIDTH:20px" type=button value="..." onclick="AssistantSearch()">&nbsp;&nbsp;<INPUT style="WIDTH:50px" type=button value="Remove" onclick="RemoveAssistant()"> </TD>
+						</TR>
+						<TR><TD>&nbsp;</TD></TR>
+						<TR><TD>&nbsp;</TD><TD>Country Code&nbsp;&nbsp;&nbsp;&nbsp;Area Code&nbsp;&nbsp;&nbsp;&nbsp;Phone Number</TD></TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Phone:&nbsp;</TD>
+							<TD>
+								&nbsp;<SELECT name=PhoneCC style="WIDTH:60px">
+									<option value=""></option>
+<% For intCount = LBound(arrPhoneCC) To UBound(arrPhoneCC)
+     Response.Write "									<option"
+     If PhoneCC = arrPhoneCC(intCount) Then Response.Write " selected"
+     Response.Write " value=""" + Server.HTMLEncode(arrPhoneCC(intCount)) + """>" + Server.HTMLEncode(arrPhoneCC(intCount)) + "</option>" + VbCrLf
+   Next  %>
+								</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;
+								<SELECT name=PhoneAC style="WIDTH:50px">
+									<OPTION value=""></OPTION>
+<% For intCount = LBound(arrPhoneAC) To UBound(arrPhoneAC)
+     Response.Write "									<option"
+     If PhoneAC = arrPhoneAC(intCount) Then Response.Write " selected"
+     Response.Write " value=""" + Server.HTMLEncode(arrPhoneAC(intCount)) + """>" + Server.HTMLEncode(arrPhoneAC(intCount)) + "</option>" + VbCrLf
+   Next  %>
+								</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;
+								<INPUT size=10 maxlength=15 name="TelephoneNumber" value="<%= Phone%>"></TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Fax:&nbsp;</TD>
+							<TD>
+								&nbsp;<SELECT name=FaxCC style="WIDTH:60px">
+									<OPTION value=""></OPTION>
+<% For intCount = LBound(arrPhoneCC) To UBound(arrPhoneCC)
+     Response.Write "									<option"
+     If FaxCC = arrPhoneCC(intCount) Then Response.Write " selected"
+     Response.Write " value=""" + Server.HTMLEncode(arrPhoneCC(intCount)) + """>" + Server.HTMLEncode(arrPhoneCC(intCount)) + "</option>" + VbCrLf
+   Next %>
+								</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;
+								<SELECT name=FaxAC style="WIDTH:50px">
+									<OPTION value=""></OPTION>
+<% For intCount = LBound(arrPhoneAC) To UBound(arrPhoneAC)
+     Response.Write "									<option"
+     If FaxAC = arrPhoneAC(intCount) Then Response.Write " selected"
+     Response.Write " value=""" + Server.HTMLEncode(arrPhoneAC(intCount)) + """>" + Server.HTMLEncode(arrPhoneAC(intCount)) + "</option>" + VbCrLf
+   Next  %>
+								</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;
+								<INPUT size=10 maxlength=15 name="FacsimileTelephoneNumber" value="<%= Fax%>"></TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Mobile:&nbsp;</TD>
+							<TD>
+								&nbsp;<SELECT name=MobileCC style="WIDTH:60px">
+									<OPTION value=""></OPTION>
+<% For intCount = LBound(arrPhoneCC) To UBound(arrPhoneCC)
+     Response.Write "									<option"
+     If MobileCC = arrPhoneCC(intCount) Then Response.Write " selected"
+     Response.Write " value=""" + Server.HTMLEncode(arrPhoneCC(intCount)) + """>" + Server.HTMLEncode(arrPhoneCC(intCount)) + "</option>" + VbCrLf
+   Next %>
+								</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;
+								<INPUT size=12 maxlength=18 name="Mobile" value="<%= Mobile%>"></TD>
+						</TR>
+						<TR><TD>&nbsp;</TD></TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Site:&nbsp;</TD>
+							<TD>
+								<SELECT name=Site onchange="SiteSelected(Site.options[Site.selectedIndex].text)">
+								</SELECT>
+							</TD>
+						</TR>
+						<TR><TD>&nbsp;</TD></TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Street:&nbsp;</TD>
+							<TD>
+								<INPUT readonly name="StreetAddress" value="<%= Trim(adoRS.Fields("StreetAddress"))%>" style="WIDTH:300px;BACKGROUND-COLOR:#E8E8E8">
+							</TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">City/District:&nbsp;</TD>
+							<TD><INPUT readonly size=15 maxlength=20 name="L" value="<%= Trim(adoRS.Fields("L"))%>" style="BACKGROUND-COLOR:#E8E8E8">&nbsp;&nbsp;<SPAN class="SubHeading">State/Province:&nbsp;</SPAN><INPUT readonly size=6 maxlength=4 name="St" value="<%= Trim(adoRS.Fields("St"))%>" style="BACKGROUND-COLOR:#E8E8E8">&nbsp;&nbsp;<SPAN class="SubHeading">Post Code:&nbsp;</SPAN><INPUT readonly size=6 maxlength=8 name="PostalCode" value="<%= Trim(adoRS.Fields("PostalCode"))%>" style="BACKGROUND-COLOR:#E8E8E8"></TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Country:&nbsp;</TD>
+							<TD>
+								<INPUT readonly name=Country style="BACKGROUND-COLOR:#E8E8E8" value="<%= Trim(adoRS.Fields("co"))%>">
+							</TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Office Phone:&nbsp;</TD>
+							<TD><INPUT readonly name="OfficePhone" value="<%
+																		Dim Temp, Temp2
+																		Temp = adoRS.Fields("otherTelephone")
+																		if not isnull(Temp) Then
+																			For each Temp2 in Temp
+																				Response.Write Temp2
+																			Next
+																		End If
+																		%>" style="BACKGROUND-COLOR:#E8E8E8"></TD>
+						</TR>
+						<TR>
+							<TD class=SubHeading style="TEXT-ALIGN:Right">Office Fax:&nbsp;</TD>
+							<TD><INPUT readonly name="OfficeFax" value="<%
+																		Temp = adoRS.Fields("otherfacsimileTelePhonenumber")
+																		if not isnull(Temp) Then
+																			For each Temp2 in Temp
+																				Response.Write Temp2
+																			Next
+																		End If
+																		%>" style="BACKGROUND-COLOR:#E8E8E8"></TD>
+						</TR>
+						<TR><TD>&nbsp;</TD></TR>
+						<TR><TD colspan=2 class=Warning>Please contact IT Support on 1300 694 262 or +61 3 9321 9072 or via email - <SPAN class=copyright><A href="mailto:redacted@example.com">redacted@example.com</A></SPAN> should your selection not be available in the drop-down lists.</TD></TR>
+						<TR><TD>&nbsp;</TD></TR>
+						<TR>
+							<TD><INPUT type=hidden name=ADSPath value="<%= adoRS.Fields("ADSPath")%>"></TD>
+							<TD><INPUT type=Submit value="Update"></TD>
+						</TR>
+					</TABLE>
+				</FORM>
+				<%End If%>
+				<DIV class=Copyright><BR>This page last updated: 12 Feb 2007 (Empired)</DIV>
+			</TD>
+		</TR>
+		<TR id=HidePrint><TD colspan=3><IMG height=11 width=770 src="Images/DottedLine.gif"></TD></TR>
+		<TR id=HidePrint><TD colspan=3 class=Copyright><A href="IntranetDisclaimer.asp">Disclaimer</A><IMG align="absmiddle" width=19 height=12 src="Images/PrivacyDivider.gif"><A href="IntranetPrivacyStatement.asp">Privacy</A><IMG align="absmiddle" width=19 height=12 src="Images/PrivacyDivider.gif">Copyright Oxiana Limited 2006</TD></TR>
+	</TABLE>
+</BODY>
+</HTML>
+<%
+	'close the recordset objects
+	if UCase(TypeName(adoRS)) <> "EMPTY" Then
+		adoRS.Close
+	End If
+	adoConn.Close
+	
+	'release the objects
+	Set adoRS = Nothing
+	Set adoConn = Nothing
+%>
