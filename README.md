@@ -27,6 +27,11 @@ Working copy of a 2002-era inetpub tree: classic ASP TimeKeeper, Empired, Domain
 
 Open `Empired/Empired (2).sln` in Visual Studio.
 
+## Requirements
+
+- Visual Studio .NET 2002
+- .NET Framework 1.0
+
 ## Attribution and provenance
 
 - No third-party source-code attribution markers were identified in assembly/package metadata.
