@@ -1,6 +1,6 @@
 # Inetpub
 
-Working copy of a 2002-era inetpub tree: classic ASP TimeKeeper, Empired, Domain Control, WOL LAN site, Oxiana IT/HR departmental intranets, personal homepages, plus VB.NET ASP.NET projects DataService, Timer, Pwgen, Empired, playtag, and WebService1. DataService.GetData runs a caller-supplied SQL query; Empired.Module1 and several ASP includes originally held SQL/AD credentials which are gitignored (see *.example). Open `Empired/Empired.sln` or `Pwgen/Pwgen.sln`. This is a historical working copy from Dave Robinson / VaderConsulting.
+Working copy of a 2002-era inetpub tree: classic ASP TimeKeeper, Empired, Domain Control, WOL LAN site, Oxiana IT/HR departmental intranets, personal homepages, plus VB.NET ASP.NET projects DataService, Timer, Pwgen, Empired, playtag, and WebService1. DataService.GetData runs a caller-supplied SQL query; Empired.Module1 and several ASP includes originally held SQL/AD credentials which are gitignored (see *.example). Open `Empired/Empired.sln` or `Pwgen/Pwgen.sln`. This is a historical working copy from Dave Robinson / Vader Consulting.
 
 **Source last updated:** 2002-08-26  
 **Language:** VB.NET  
@@ -9,7 +9,7 @@ Working copy of a 2002-era inetpub tree: classic ASP TimeKeeper, Empired, Domain
 
 ## What it is
 
-Working copy of a 2002-era inetpub tree: classic ASP TimeKeeper, Empired, Domain Control, WOL LAN site, Oxiana IT/HR departmental intranets, personal homepages, plus VB.NET ASP.NET projects DataService, Timer, Pwgen, Empired, playtag, and WebService1. DataService.GetData runs a caller-supplied SQL query; Empired.Module1 and several ASP includes originally held SQL/AD credentials which are gitignored (see *.example). Open `Empired/Empired.sln` or `Pwgen/Pwgen.sln`. This is a historical working copy from Dave Robinson / VaderConsulting.
+Working copy of a 2002-era inetpub tree: classic ASP TimeKeeper, Empired, Domain Control, WOL LAN site, Oxiana IT/HR departmental intranets, personal homepages, plus VB.NET ASP.NET projects DataService, Timer, Pwgen, Empired, playtag, and WebService1. DataService.GetData runs a caller-supplied SQL query; Empired.Module1 and several ASP includes originally held SQL/AD credentials which are gitignored (see *.example). Open `Empired/Empired.sln` or `Pwgen/Pwgen.sln`. This is a historical working copy from Dave Robinson / Vader Consulting.
 
 ## Solution structure
 
